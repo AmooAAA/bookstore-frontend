@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>我的購物車</title>
+  <style>
+    /* 與上架頁面相似，這裡簡化了樣式 */
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background-color: #fdf8f1;
+      color: #4b3621;
+      max-width: 960px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 25px;
+      background-color: #fffef9;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #e0d3c2;
+      text-align: left;
+    }
+
+    th {
+      background-color: #eee1d1;
+      color: #4a3723;
+    }
+
+    tr:hover {
+      background-color: #f8f1e7;
+    }
+
+    button {
+      background-color: #a47149;
+      color: #fff;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #8e5c34;
+    }
+    
+    .center {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    #total {
+      font-size: 1.2em;
+      font-weight: bold;
+      text-align: right;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🛒 我的購物車</h1>
+
+  <table id="cartTable">
+    <thead>
+      <tr>
+        <th>書名</th>
+        <th>價格</th>
+        <th>數量</th>
+        <th>總價</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div id="total">
+    總金額: $<span id="totalPrice">0</span>
+  </div>
+
+  <div class="center">
+    <button onclick="checkout()">結帳</button>
+  </div>
+
+  <script>
+    const cart = [];
+
+    // 範例：假設這是已經加入購物車的書籍資料
+    const sampleCartData = [
+      { title: '書籍 1', price: 300, quantity: 1 },
+      { title: '書籍 2', price: 250, quantity: 2 },
+    ];
+
+    function renderCart() {
+      const tbody = document.querySelector('#cartTable tbody');
+      tbody.innerHTML = '';
+      let total = 0;
+
+      sampleCartData.forEach((item, index) => {
+        const row = document.createElement('tr');
+        const totalPrice = item.price * item.quantity;
+        total += totalPrice;
+        row.innerHTML = `
+          <td>${item.title}</td>
+          <td>$${item.price}</td>
+          <td>
+            <input type="number" value="${item.quantity}" min="1" onchange="updateQuantity(${index}, this.value)">
+          </td>
+          <td>$${totalPrice}</td>
+          <td><button onclick="removeFromCart(${index})">移除</button></td>
+        `;
+        tbody.appendChild(row);
+      });
+
+      document.getElementById('totalPrice').innerText = total;
+    }
+
+    function updateQuantity(index, newQuantity) {
+      sampleCartData[index].quantity = parseInt(newQuantity);
+      renderCart();
+    }
+
+    function removeFromCart(index) {
+      sampleCartData.splice(index, 1);
+      renderCart();
+    }
+
+    function checkout() {
+      // 這裡可以將購物車資料傳到伺服器進行結帳處理
+      alert("已完成結帳！");
+    }
+
+    // 頁面載入時渲染購物車
+    renderCart();
+  </script>
+</body>
+</html>
