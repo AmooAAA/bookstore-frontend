@@ -132,6 +132,7 @@
   <div style="text-align: center;">
     <button onclick="window.location.href='index.html'">📚 查看我的書籍</button>
     <button onclick="window.location.href='cart.html'">🛒 購物車</button>
+    <button onclick="logout()">🚪 登出</button>
   </div>
 
   <h2>📚 所有書籍</h2>
@@ -167,20 +168,18 @@
   <script>
     // ⚙️ 初始化 LIFF
     async function initLiff() {
-  try {
-    await liff.init({ liffId: "2007363323-BlP5rZeJ" }); // ← 換成你的 LIFF ID
-    if (!liff.isLoggedIn()) {
-      liff.login();  // ✅ 沒登入就強制登入（不能刪）
-    } else {
-      const profile = await liff.getProfile();
-      document.getElementById('sellerId').value = profile.userId;
+      try {
+        await liff.init({ liffId: "你的 LIFF ID" }); // ← 填入你的 LIFF ID！
+        if (!liff.isLoggedIn()) {
+          liff.login();
+        } else {
+          const profile = await liff.getProfile();
+          document.getElementById('sellerId').value = profile.userId; // 或 profile.displayName
+        }
+      } catch (err) {
+        console.error("LIFF 初始化失敗:", err);
+      }
     }
-  } catch (err) {
-    console.error("LIFF 初始化失敗:", err);
-    alert("LIFF 初始化失敗，請重新整理或聯絡管理員。");
-  }
-}
-
 
     initLiff();
 
@@ -234,6 +233,12 @@
 
     function addToCart(bookId) {
       alert(`✅ 已將書籍加入購物車：${bookId}`);
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      alert("已登出！");
+      window.location.href = 'login.html';
     }
 
     fetchBooks();
