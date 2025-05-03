@@ -134,6 +134,9 @@
     
     <!-- 「購物車」按鈕 -->
     <button onclick="window.location.href='cart.html'">🛒 購物車</button>
+    
+    <!-- 登出按鈕 -->
+    <button onclick="logout()">🚪 登出</button>
   </div>
 
   <h2>📚 所有書籍</h2>
@@ -217,6 +220,13 @@
     function addToCart(bookId) {
       alert(`✅ 已將書籍加入購物車：${bookId}`);
       // 在這裡可以寫入加入購物車的邏輯
+    }
+
+    function logout() {
+      // 清除登入資料 (假設你使用的是 localStorage 存儲 token)
+      localStorage.removeItem('token');
+      alert("已登出！");
+      window.location.href = 'login.html'; // 跳轉到登入頁面
     }
 
     // 初始載入書籍資料

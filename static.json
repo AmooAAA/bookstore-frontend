@@ -1,6 +1,6 @@
 {
     "routes": {
-      "/**": "bookForm.html"
+      "/**": "index.html"
     }
   }
   
