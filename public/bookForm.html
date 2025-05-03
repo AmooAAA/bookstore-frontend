@@ -104,31 +104,18 @@
       });
 
       const result = await response.json();
-      alert('✅ 書籍新增成功！');
+      alert('書籍新增成功！');
       this.reset();
       fetchBooks();
     });
 
     async function fetchBooks() {
-      const response = await fetch('https://cccbookbot-0c3d990eba99.herokuapp.com');
+      const response = await fetch('https://cccbookbot-0c3d990eba99.herokuapp.com/api/books');
       const books = await response.json();
-      renderBooks(books);
-    }
-
-    function renderBooks(books) {
       const tbody = document.querySelector('#booksTable tbody');
       tbody.innerHTML = '';
 
-      const searchQuery = document.getElementById('searchInput').value.toLowerCase();
-      const conditionFilter = document.getElementById('conditionFilter').value;
-
-      const filteredBooks = books.filter(book => {
-        const matchesTitleOrAuthor = book.title.toLowerCase().includes(searchQuery) || book.author.toLowerCase().includes(searchQuery);
-        const matchesCondition = conditionFilter ? book.condition.toLowerCase() === conditionFilter : true;
-        return matchesTitleOrAuthor && matchesCondition;
-      });
-
-      filteredBooks.forEach(book => {
+      books.forEach(book => {
         const row = document.createElement('tr');
         row.innerHTML = `
           <td>${book.title}</td>
