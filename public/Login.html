@@ -31,7 +31,7 @@
         document.getElementById('status').innerText = `歡迎 ${displayName}，自動登入中...`;
 
         // 呼叫後端 API，傳送 LINE 資訊進行登入
-        const res = await fetch('https://your-backend-url.com/api/loginByLine', {
+        const res = await fetch('https://cccbookbot-0c3d990eba99.herokuapp.com/api/loginByLine', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
