@@ -1,26 +1,30 @@
-// models/User.js
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-  lineId: {
+  username: {
     type: String,
-    unique: true,
-    sparse: true, // 允許空值但不可重複
+    required: false,  // 因為 Line 登入可自動生成
     trim: true
   },
   name: {
     type: String,
-    required: true,
+    required: false,  // 可選
     trim: true
   },
   email: {
     type: String,
+    required: false,  // Line 登入可能沒有
     trim: true
-    // 不設 required，LINE 登入時有可能沒有 email
   },
   password: {
     type: String,
-    // 不設 required，LINE 登入時不會有密碼
+    required: false  // Line 登入用不到密碼
+  },
+  lineId: {
+    type: String,
+    required: false,
+    unique: true,
+    sparse: true  // 避免唯一值索引衝突
   },
   createdAt: {
     type: Date,
@@ -29,5 +33,4 @@ const userSchema = new mongoose.Schema({
 });
 
 const User = mongoose.model('User', userSchema);
-
 module.exports = User;
