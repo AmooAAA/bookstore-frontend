@@ -81,6 +81,22 @@
       from { opacity: 0; transform: translateY(-20px); }
       to   { opacity: 1; transform: translateY(0); }
     }
+
+    .register-link {
+      margin-top: 1.5rem;
+      display: block;
+      font-size: 14px;
+    }
+
+    .register-link a {
+      color: #a47148;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .register-link a:hover {
+      color: #8b5e3c;
+    }
   </style>
 </head>
 <body>
@@ -97,6 +113,10 @@
     </form>
 
     <p id="message"></p>
+
+    <div class="register-link">
+      <p>還沒有帳號？ <a href="register.html">註冊</a></p>
+    </div>
   </div>
 
   <script>

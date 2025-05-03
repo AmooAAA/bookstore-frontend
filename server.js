@@ -5,6 +5,7 @@ const cors = require('cors'); // 引入 cors
 const jwt = require('jsonwebtoken'); // 用於生成 JWT
 const bcrypt = require('bcryptjs'); // 用於加密密碼
 const path = require('path'); // 加入這行
+const User = require('./models/User'); // 假設你已經有 User 模型
 
 const app = express();
 
@@ -60,6 +61,35 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
+// 註冊 API
+app.post('/api/register', async (req, res) => {
+  const { username, email, password } = req.body;
+
+  try {
+    // 檢查是否有相同的使用者名稱或郵箱
+    const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+    if (existingUser) {
+      return res.status(400).json({ success: false, message: '帳號或郵箱已存在' });
+    }
+
+    // 密碼加密
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // 創建新用戶
+    const newUser = new User({
+      username,
+      email,
+      password: hashedPassword,
+    });
+
+    await newUser.save();
+
+    res.status(201).json({ success: true, message: '註冊成功' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: '伺服器錯誤' });
+  }
+});
+
 // 根目錄顯示 bookForm.html
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'bookForm.html'));
@@ -68,6 +98,11 @@ app.get('/', (req, res) => {
 // 顯示 login.html 頁面
 app.get('/login.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'Login.html'));
+});
+
+// 顯示 register.html 頁面
+app.get('/register.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'register.html'));
 });
 
 // 啟動伺服器
