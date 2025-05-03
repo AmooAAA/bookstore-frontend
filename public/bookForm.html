@@ -272,7 +272,7 @@
     });
 
     async function fetchBooks() {
-      const response = await fetch('http://localhost:5000/api/books');
+      const response = await fetch('https://cccbookbot-0c3d990eba99.herokuapp.com');
       const books = await response.json();
       renderBooks(books);
     }

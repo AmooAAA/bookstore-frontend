@@ -6,7 +6,7 @@ const BookList = () => {
 
   useEffect(() => {
     // 向後端請求所有書籍資料
-    fetch('http://localhost:5000/api/books')
+    fetch('https://cccbookbot-0c3d990eba99.herokuapp.com/api/books')
       .then(response => response.json())
       .then(data => setBooks(data))
       .catch(error => console.error('Error fetching books:', error));
