@@ -1,4 +1,4 @@
-require('dotenv').config(); // 載入 .env 檔案 
+require('dotenv').config(); // 載入 .env 檔案
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors'); // 引入 cors
@@ -10,7 +10,11 @@ const User = require('./models/User'); // 假設你已經有 User 模型
 const app = express();
 
 // 使用 cors 中介軟體
-app.use(cors()); // 允許所有來源訪問 API
+app.use(cors({
+  origin: '*', // 允許所有來源訪問 API
+  methods: ['GET', 'POST'], // 允許的請求方法
+  allowedHeaders: ['Content-Type', 'Authorization'] // 允許的標頭
+}));
 
 // 中介軟體
 app.use(express.json());
@@ -25,10 +29,10 @@ mongoose.connect(process.env.MONGODB_URI)
 
 // 引入路由
 const userRoutes = require('./routes/userRoutes');
-app.use('/api', userRoutes);
+app.use('/api/users', userRoutes); // 修改路由前綴
 
 const bookRoutes = require('./routes/bookRoutes');
-app.use('/api', bookRoutes);
+app.use('/api/books', bookRoutes); // 修改路由前綴
 
 // 引入購物車路由
 const cartRoutes = require('./routes/cart');
