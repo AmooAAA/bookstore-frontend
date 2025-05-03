@@ -2,180 +2,53 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <title>登入 Login</title>
-  <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
-  <style>
-    * {
-      box-sizing: border-box;
-      font-family: 'Segoe UI', sans-serif;
-    }
-
-    body {
-      margin: 0;
-      padding: 0;
-      background: #f3e9dd;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-
-    .login-container {
-      background: #fffaf3;
-      padding: 2rem 2.5rem;
-      border-radius: 16px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-      width: 320px;
-      text-align: center;
-      animation: fadeIn 1s ease-in-out;
-    }
-
-    h2 {
-      color: #6b4f3b;
-      margin-bottom: 1.5rem;
-    }
-
-    label {
-      display: block;
-      text-align: left;
-      color: #5c3e2f;
-      font-weight: bold;
-      margin-top: 1rem;
-    }
-
-    input {
-      width: 100%;
-      padding: 0.5rem;
-      margin-top: 0.3rem;
-      border: 1px solid #d8c3a5;
-      border-radius: 8px;
-      background: #fffaf3;
-      transition: border 0.3s;
-    }
-
-    input:focus {
-      outline: none;
-      border-color: #b08968;
-    }
-
-    button {
-      margin-top: 1.5rem;
-      padding: 0.6rem 1.2rem;
-      background: #a47148;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    button:hover {
-      background: #8b5e3c;
-    }
-
-    #message {
-      margin-top: 1rem;
-      font-weight: bold;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-20px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .register-link {
-      margin-top: 1.5rem;
-      display: block;
-      font-size: 14px;
-    }
-
-    .register-link a {
-      color: #a47148;
-      text-decoration: none;
-      font-weight: bold;
-    }
-
-    .register-link a:hover {
-      color: #8b5e3c;
-    }
-  </style>
+  <title>Line 自動登入</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
 <body>
-  <div class="login-container">
-    <h2>使用者登入</h2>
-    <form id="loginForm">
-      <label for="email">Email：</label>
-      <input type="email" id="email" required />
-
-      <label for="password">密碼：</label>
-      <input type="password" id="password" required />
-
-      <button type="submit">登入</button>
-    </form>
-
-    <p id="message"></p>
-
-    <div class="register-link">
-      <p>還沒有帳號？ <a href="register.html">註冊</a></p>
-    </div>
-  </div>
+  <h2 id="status">正在檢查 Line 登入狀態...</h2>
 
   <script>
-    const liffId = "2007363323-BlP5rZeJ"; // <-- 替換成你自己的 LIFF ID
+    const liffId = '2007363323-BlP5rZeJ'; // << 替換成你自己的 LIFF ID
 
-    // 初始化 LIFF
-    window.onload = async function () {
-      try {
-        await liff.init({ liffId });
+    async function main() {
+      await liff.init({ liffId });
 
-        if (!liff.isLoggedIn()) {
-          liff.login();
-        } else {
-          const profile = await liff.getProfile();
-          console.log("已透過 LINE 登入：", profile.displayName);
-          // 你可以直接跳轉或顯示歡迎訊息
-          // window.location.href = 'bookForm.html';
-        }
-      } catch (err) {
-        console.error("LIFF 初始化失敗", err);
-        document.getElementById('message').textContent = '❌ LIFF 初始化錯誤';
+      if (!liff.isLoggedIn()) {
+        // 使用者尚未登入，導向登入
+        liff.login();
+        return;
       }
-    };
 
-    // 處理表單登入
-    document.getElementById('loginForm').addEventListener('submit', async function (e) {
-      e.preventDefault();
+      const profile = await liff.getProfile();
+      const email = liff.getDecodedIDToken().email || '';
+      const userId = profile.userId;
+      const displayName = profile.displayName;
 
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
+      document.getElementById('status').innerText = `歡迎 ${displayName}，自動登入中...`;
 
-      try {
-        const response = await fetch('https://cccbookbot-0c3d990eba99.herokuapp.com/api/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email, password }),
-        });
+      // 呼叫後端 API 自動登入（你要設計這支）
+      const res = await fetch('https://cccbookbot-0c3d990eba99.herokuapp.com/api/loginByLine', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          lineId: userId,
+          name: displayName,
+          email: email
+        })
+      });
 
-        const data = await response.json();
-        const messageEl = document.getElementById('message');
+      const data = await res.json();
 
-        if (data.success) {
-          messageEl.textContent = '✅ 登入成功！';
-          messageEl.style.color = 'green';
-
-          localStorage.setItem('token', data.token);
-          window.location.href = 'bookForm.html';
-        } else {
-          messageEl.textContent = '❌ ' + data.message;
-          messageEl.style.color = 'red';
-        }
-      } catch (error) {
-        console.error('登入失敗', error);
-        document.getElementById('message').textContent = '❌ 發生錯誤，請稍後再試';
+      if (data.success) {
+        localStorage.setItem('token', data.token);
+        window.location.href = 'bookForm.html'; // 成功就導向主頁
+      } else {
+        document.getElementById('status').innerText = '❌ 登入失敗：' + data.message;
       }
-    });
+    }
+
+    main();
   </script>
 </body>
 </html>
