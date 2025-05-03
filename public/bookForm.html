@@ -7,96 +7,84 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: white;
-      margin: 0;
+      margin: 20px;
       padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding-top: 20px;
+      background-color: #f4f4f9;
     }
-
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 20px;
+    h1, h2 {
+      text-align: center;
+      color: #333;
     }
-
-    h2 {
-      font-size: 1.5rem;
-      margin-top: 30px;
-    }
-
     form {
-      display: flex;
-      flex-direction: column;
-      width: 300px;
-      margin-bottom: 30px;
+      margin: 20px 0;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
-
     form div {
       margin-bottom: 15px;
     }
-
     label {
-      font-size: 1rem;
+      display: block;
+      font-weight: bold;
       margin-bottom: 5px;
     }
-
-    input[type="text"],
-    input[type="number"],
-    select {
+    input[type="text"], input[type="number"], select {
       width: 100%;
-      padding: 8px;
-      font-size: 1rem;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-
-    button {
       padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
       background-color: #4CAF50;
       color: white;
       border: none;
       border-radius: 5px;
       cursor: pointer;
     }
-
     button:hover {
       background-color: #45a049;
     }
-
+    #searchInput, #conditionFilter {
+      width: 48%;
+      margin-right: 4%;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      margin-top: 20px;
+    }
+    #conditionFilter {
+      width: 48%;
+      margin-right: 0;
+    }
     table {
-      width: 80%;
+      width: 100%;
       margin-top: 20px;
       border-collapse: collapse;
+      background-color: #fff;
     }
-
     th, td {
       padding: 12px;
-      text-align: left;
-      border-bottom: 1px solid #ddd;
+      text-align: center;
+      border: 1px solid #ddd;
     }
-
     th {
       background-color: #f4f4f4;
     }
-
     img {
-      width: 50px;
+      width: 100px;
       height: auto;
-    }
-
-    input[type="text"], select {
-      margin-bottom: 20px;
-    }
-
-    #searchInput, #conditionFilter {
-      margin-right: 10px;
     }
   </style>
 </head>
 <body>
   <h1>📖 新增書籍</h1>
+  
   <div>
     <form id="bookForm">
       <div>
@@ -140,15 +128,17 @@
     </form>
   </div>
 
-  <!-- 「查看我的書籍」按鈕 -->
-  <button onclick="window.location.href='index.html'">📚 查看我的書籍</button>
-
-  <!-- 「購物車」按鈕 -->
-  <button onclick="window.location.href='cart.html'">🛒 購物車</button>
+  <div style="text-align: center;">
+    <!-- 「查看我的書籍」按鈕 -->
+    <button onclick="window.location.href='index.html'">📚 查看我的書籍</button>
+    
+    <!-- 「購物車」按鈕 -->
+    <button onclick="window.location.href='cart.html'">🛒 購物車</button>
+  </div>
 
   <h2>📚 所有書籍</h2>
 
-  <div>
+  <div style="text-align: center;">
     <input type="text" id="searchInput" placeholder="搜尋書名或作者..." oninput="filterBooks()">
     <select id="conditionFilter" onchange="filterBooks()">
       <option value="">過濾書籍狀況</option>
@@ -157,7 +147,7 @@
     </select>
   </div>
 
-  <div>
+  <div style="text-align: center;">
     <button onclick="fetchBooks()">🔄 重新載入</button>
   </div>
 
