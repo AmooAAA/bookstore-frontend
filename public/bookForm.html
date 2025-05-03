@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>二手書上架</title>
+  <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script> <!-- LIFF SDK -->
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -108,8 +109,8 @@
         <input type="text" name="description" required>
       </div>
       <div>
-        <label>賣家 ID</label>
-        <input type="text" name="seller_id" required>
+        <label>賣家 ID（自動帶入）</label>
+        <input type="text" name="seller_id" id="sellerId" readonly>
       </div>
       <div>
         <label>圖片網址</label>
@@ -129,13 +130,8 @@
   </div>
 
   <div style="text-align: center;">
-    <!-- 「查看我的書籍」按鈕 -->
     <button onclick="window.location.href='index.html'">📚 查看我的書籍</button>
-    
-    <!-- 「購物車」按鈕 -->
     <button onclick="window.location.href='cart.html'">🛒 購物車</button>
-    
-    <!-- 登出按鈕 -->
     <button onclick="logout()">🚪 登出</button>
   </div>
 
@@ -170,6 +166,24 @@
   </table>
 
   <script>
+    // ⚙️ 初始化 LIFF
+    async function initLiff() {
+      try {
+        await liff.init({ liffId: "2007363323-BlP5rZeJ" }); // ← 填入你的 LIFF ID！
+        if (!liff.isLoggedIn()) {
+          liff.login();
+        } else {
+          const profile = await liff.getProfile();
+          document.getElementById('sellerId').value = profile.userId; // 或 profile.displayName
+        }
+      } catch (err) {
+        console.error("LIFF 初始化失敗:", err);
+      }
+    }
+
+    initLiff();
+
+    // 📬 提交表單
     document.getElementById('bookForm').addEventListener('submit', async function(e) {
       e.preventDefault();
       const formData = new FormData(this);
@@ -219,17 +233,14 @@
 
     function addToCart(bookId) {
       alert(`✅ 已將書籍加入購物車：${bookId}`);
-      // 在這裡可以寫入加入購物車的邏輯
     }
 
     function logout() {
-      // 清除登入資料 (假設你使用的是 localStorage 存儲 token)
       localStorage.removeItem('token');
       alert("已登出！");
-      window.location.href = 'login.html'; // 跳轉到登入頁面
+      window.location.href = 'login.html';
     }
 
-    // 初始載入書籍資料
     fetchBooks();
   </script>
 </body>
