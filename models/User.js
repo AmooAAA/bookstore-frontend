@@ -1,8 +1,13 @@
 // models/User.js
 const mongoose = require('mongoose');
 
-// 建立 User schema
 const userSchema = new mongoose.Schema({
+  lineId: {
+    type: String,
+    unique: true,
+    sparse: true, // 允許空值但不可重複
+    trim: true
+  },
   name: {
     type: String,
     required: true,
@@ -10,13 +15,12 @@ const userSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    required: true,
-    unique: true,
     trim: true
+    // 不設 required，LINE 登入時有可能沒有 email
   },
   password: {
     type: String,
-    required: true
+    // 不設 required，LINE 登入時不會有密碼
   },
   createdAt: {
     type: Date,
@@ -24,7 +28,6 @@ const userSchema = new mongoose.Schema({
   }
 });
 
-// 建立 User 模型
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;
