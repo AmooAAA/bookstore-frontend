@@ -1,37 +1,35 @@
 // BookList.js
 import React, { useState, useEffect } from 'react';
-import './BookList.css'; // 如果你有額外 CSS 的話可以加上
 
 const BookList = () => {
   const [books, setBooks] = useState([]);
 
   useEffect(() => {
-    fetch('https://cccbookbot-0c3d990eba99.herokuapp.com/api/books')
+    // 向後端請求所有書籍資料
+    fetch('http://localhost:5000/api/books')
       .then(response => response.json())
-      .then(data => {
-        console.log('取得的書籍資料:', data);
-        setBooks(data);
-      })
-      .catch(error => console.error('取得書籍資料錯誤:', error));
+      .then(data => setBooks(data))
+      .catch(error => console.error('Error fetching books:', error));
   }, []);
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h2>📚 書籍列表</h2>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
+    <div>
+      <h2>書籍列表</h2>
+      <div className="book-list">
         {books.length > 0 ? (
           books.map(book => (
-            <div key={book._id || book.title} style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '10px' }}>
-              <img src={book.image_url} alt={book.title} style={{ width: '100%', height: '200px', objectFit: 'cover' }} />
+            <div key={book._id} className="book-item">
               <h3>{book.title}</h3>
-              <p><strong>作者：</strong>{book.author}</p>
-              <p><strong>價格：</strong>${book.price}</p>
-              <p><strong>狀態：</strong>{book.condition}</p>
+              <p>{book.author}</p>
+              <p>價格: ${book.price}</p>
+              <p>狀態: {book.condition}</p>
               <p>{book.description}</p>
+              {/* 添加圖片顯示 */}
+              {book.image_url && <img src={book.image_url} alt={book.title} />}
             </div>
           ))
         ) : (
-          <p>📭 目前沒有書籍可顯示。</p>
+          <p>目前沒有書籍可顯示。</p>
         )}
       </div>
     </div>
