@@ -2,254 +2,39 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- 加入viewport設置，使頁面適應各種螢幕尺寸 -->
   <title>二手書上架</title>
   <style>
-    body {
-      font-family: "Segoe UI", sans-serif;
-      background-color: #fdf8f1;
-      color: #4b3621;
-      max-width: 960px;
-      margin: 40px auto;
-      padding: 20px;
-    }
-
-    h1, h2 {
-      color: #5e422b;
-      text-align: center;
-    }
-
-    .form-container {
-      background-color: #fffaf3;
-      border: 1px solid #e4d7c4;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-      margin-bottom: 30px;
-      max-width: 500px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    form {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    form label {
-      display: block;
-      font-weight: bold;
-      margin-bottom: 5px;
-      color: #5a3e29;
-    }
-
-    form input,
-    form select {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid #cbb89d;
-      border-radius: 6px;
-      background-color: #fffdf7;
-      box-sizing: border-box;
-    }
-
-    .full-width {
-      grid-column: 1 / 3;
-    }
-
-    button {
-      padding: 10px 16px;
-      background-color: #a47149;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-
-    button:hover {
-      background-color: #8e5c34;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 25px;
-      background-color: #fffef9;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    th, td {
-      padding: 12px;
-      border-bottom: 1px solid #e0d3c2;
-      text-align: left;
-    }
-
-    th {
-      background-color: #eee1d1;
-      color: #4a3723;
-    }
-
-    tr:hover {
-      background-color: #f8f1e7;
-    }
-
-    img {
-      max-width: 80px; /* 修改圖片的最大寬度，讓它適合手機端顯示 */
-      height: auto; /* 保持圖片比例 */
-      border-radius: 6px;
-    }
-
-    .center {
-      text-align: center;
-      margin-top: 20px;
-    }
-
-    #booksTable button {
-      background-color: #c96b6b;
-      color: #fff;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    .search-container {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      margin-bottom: 20px;
-      flex-wrap: wrap; /* 使搜尋框和篩選選單在小螢幕上換行 */
-    }
-
-    .search-container input,
-    .search-container select {
-      padding: 8px;
-      border-radius: 6px;
-      border: 1px solid #cbb89d;
-      background-color: #fffdf7;
-      width: 250px;  /* 控制輸入框與選單的寬度 */
-      box-sizing: border-box;
-    }
-
-    .cart-button,
-    .top-right-button {
-      position: fixed;
-      background-color: #a47149;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-
-    .cart-button:hover,
-    .top-right-button:hover {
-      background-color: #8e5c34;
-    }
-
-    /* 使「購物車」按鈕固定在右下角 */
-    .cart-button {
-      bottom: 20px;
-      right: 20px;
-    }
-
-    /* 使「我的書籍」按鈕固定在右上角 */
-    .top-right-button {
-      top: 20px;
-      right: 20px;
-    }
-
-    /* 優化手機端顯示表格 */
-    @media (max-width: 600px) {
-      table {
-        font-size: 14px;
-      }
-
-      th, td {
-        padding: 8px;
-      }
-
-      .search-container input,
-      .search-container select {
-        width: 100%; /* 在小螢幕上，搜尋框和篩選選單寬度填滿容器 */
-      }
-
-      img {
-        max-width: 60px; /* 更小圖片尺寸 */
-      }
-    }
+    body { font-family: sans-serif; max-width: 700px; margin: auto; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #f0f0f0; }
+    h1, h2 { color: #333; }
+    img { max-width: 100px; }
   </style>
 </head>
 <body>
-  <h1>📖 新增書籍</h1>
-  <div class="form-container">
-    <form id="bookForm">
-      <div>
-        <label>書名</label>
-        <input type="text" name="title" required>
-      </div>
-      <div>
-        <label>作者</label>
-        <input type="text" name="author" required>
-      </div>
-      <div>
-        <label>價格</label>
-        <input type="number" name="price" required>
-      </div>
-      <div>
-        <label>書況</label>
-        <input type="text" name="condition" required>
-      </div>
-      <div class="full-width">
-        <label>說明</label>
-        <input type="text" name="description" required>
-      </div>
-      <div>
-        <label>賣家 ID</label>
-        <input type="text" name="seller_id" required>
-      </div>
-      <div>
-        <label>圖片網址</label>
-        <input type="text" name="image_url" value="https://tinypic.host/images/2025/04/07/-2025-04-07-144124.jpg">
-      </div>
-      <div class="full-width">
-        <label>是否已售出</label>
-        <select name="is_sold">
-          <option value="false">否</option>
-          <option value="true">是</option>
-        </select>
-      </div>
-      <div class="full-width center">
-        <button type="submit">📥 送出</button>
-      </div>
-    </form>
-  </div>
-
-  <!-- 「查看我的書籍」按鈕 -->
-  <button class="top-right-button" onclick="window.location.href='index.html'">📚 查看我的書籍</button>
-
-  <!-- 「購物車」按鈕 -->
-  <button class="cart-button" onclick="window.location.href='cart.html'">🛒 購物車</button>
+  <h1>新增書籍</h1>
+  <form id="bookForm">
+    <label>書名: <input type="text" name="title" required></label><br>
+    <label>作者: <input type="text" name="author" required></label><br>
+    <label>價格: <input type="number" name="price" required></label><br>
+    <label>書況: <input type="text" name="condition" required></label><br>
+    <label>說明: <input type="text" name="description" required></label><br>
+    <label>賣家 ID: <input type="text" name="seller_id" required></label><br>
+    <label>圖片網址: 
+      <input type="text" name="image_url" id="image_url" value="https://tinypic.host/images/2025/04/07/-2025-04-07-144124.jpg">
+    </label><br>
+    <label>是否已售出: 
+      <select name="is_sold">
+        <option value="false">否</option>
+        <option value="true">是</option>
+      </select>
+    </label><br>
+    <button type="submit">送出</button>
+  </form>
 
   <h2>📚 所有書籍</h2>
-
-  <div class="search-container">
-    <input type="text" id="searchInput" placeholder="搜尋書名或作者..." oninput="filterBooks()">
-    <select id="conditionFilter" onchange="filterBooks()">
-      <option value="">過濾書籍狀況</option>
-      <option value="new">全新</option>
-      <option value="used">二手</option>
-    </select>
-  </div>
-
-  <div class="center">
-    <button onclick="fetchBooks()">🔄 重新載入</button>
-  </div>
-
+  <button onclick="fetchBooks()">🔄 重新載入</button>
   <table id="booksTable">
     <thead>
       <tr>
@@ -259,7 +44,6 @@
         <th>書況</th>
         <th>已售出</th>
         <th>圖片</th>
-        <th>操作</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -276,38 +60,25 @@
         data[key] = value;
       });
 
-      const response = await fetch('https://cccbookbot-0c3d990eba99.herokuapp.com/api/books', {
+      const response = await fetch('http://localhost:5000/api/books', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       });
 
       const result = await response.json();
-      alert('✅ 書籍新增成功！');
+      alert('書籍新增成功！');
       this.reset();
       fetchBooks();
     });
 
     async function fetchBooks() {
-      const response = await fetch('https://cccbookbot-0c3d990eba99.herokuapp.com');
+      const response = await fetch('http://localhost:5000/api/books');
       const books = await response.json();
-      renderBooks(books);
-    }
-
-    function renderBooks(books) {
       const tbody = document.querySelector('#booksTable tbody');
       tbody.innerHTML = '';
 
-      const searchQuery = document.getElementById('searchInput').value.toLowerCase();
-      const conditionFilter = document.getElementById('conditionFilter').value;
-
-      const filteredBooks = books.filter(book => {
-        const matchesTitleOrAuthor = book.title.toLowerCase().includes(searchQuery) || book.author.toLowerCase().includes(searchQuery);
-        const matchesCondition = conditionFilter ? book.condition.toLowerCase() === conditionFilter : true;
-        return matchesTitleOrAuthor && matchesCondition;
-      });
-
-      filteredBooks.forEach(book => {
+      books.forEach(book => {
         const row = document.createElement('tr');
         row.innerHTML = `
           <td>${book.title}</td>
@@ -316,23 +87,12 @@
           <td>${book.condition}</td>
           <td>${book.is_sold ? '✔️' : '❌'}</td>
           <td><img src="${book.image_url}" alt="書籍圖片"></td>
-          <td><button onclick="addToCart('${book._id}')">加入購物車</button></td>
         `;
         tbody.appendChild(row);
       });
     }
 
-    function filterBooks() {
-      fetchBooks();
-    }
-
-    function addToCart(bookId) {
-      alert(`✅ 已將書籍加入購物車：${bookId}`);
-      // 在這裡可以寫入加入購物車的邏輯
-    }
-
-    // 初始載入書籍資料
-    fetchBooks();
+    fetchBooks(); // 頁面載入時自動顯示
   </script>
 </body>
 </html>
