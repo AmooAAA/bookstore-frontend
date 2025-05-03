@@ -2,39 +2,75 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>二手書上架</title>
-  <style>
-    body { font-family: sans-serif; max-width: 700px; margin: auto; }
-    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-    th { background-color: #f0f0f0; }
-    h1, h2 { color: #333; }
-    img { max-width: 100px; }
-  </style>
 </head>
 <body>
-  <h1>新增書籍</h1>
-  <form id="bookForm">
-    <label>書名: <input type="text" name="title" required></label><br>
-    <label>作者: <input type="text" name="author" required></label><br>
-    <label>價格: <input type="number" name="price" required></label><br>
-    <label>書況: <input type="text" name="condition" required></label><br>
-    <label>說明: <input type="text" name="description" required></label><br>
-    <label>賣家 ID: <input type="text" name="seller_id" required></label><br>
-    <label>圖片網址: 
-      <input type="text" name="image_url" id="image_url" value="https://tinypic.host/images/2025/04/07/-2025-04-07-144124.jpg">
-    </label><br>
-    <label>是否已售出: 
-      <select name="is_sold">
-        <option value="false">否</option>
-        <option value="true">是</option>
-      </select>
-    </label><br>
-    <button type="submit">送出</button>
-  </form>
+  <h1>📖 新增書籍</h1>
+  <div>
+    <form id="bookForm">
+      <div>
+        <label>書名</label>
+        <input type="text" name="title" required>
+      </div>
+      <div>
+        <label>作者</label>
+        <input type="text" name="author" required>
+      </div>
+      <div>
+        <label>價格</label>
+        <input type="number" name="price" required>
+      </div>
+      <div>
+        <label>書況</label>
+        <input type="text" name="condition" required>
+      </div>
+      <div>
+        <label>說明</label>
+        <input type="text" name="description" required>
+      </div>
+      <div>
+        <label>賣家 ID</label>
+        <input type="text" name="seller_id" required>
+      </div>
+      <div>
+        <label>圖片網址</label>
+        <input type="text" name="image_url" value="https://tinypic.host/images/2025/04/07/-2025-04-07-144124.jpg">
+      </div>
+      <div>
+        <label>是否已售出</label>
+        <select name="is_sold">
+          <option value="false">否</option>
+          <option value="true">是</option>
+        </select>
+      </div>
+      <div>
+        <button type="submit">📥 送出</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- 「查看我的書籍」按鈕 -->
+  <button onclick="window.location.href='index.html'">📚 查看我的書籍</button>
+
+  <!-- 「購物車」按鈕 -->
+  <button onclick="window.location.href='cart.html'">🛒 購物車</button>
 
   <h2>📚 所有書籍</h2>
-  <button onclick="fetchBooks()">🔄 重新載入</button>
+
+  <div>
+    <input type="text" id="searchInput" placeholder="搜尋書名或作者..." oninput="filterBooks()">
+    <select id="conditionFilter" onchange="filterBooks()">
+      <option value="">過濾書籍狀況</option>
+      <option value="new">全新</option>
+      <option value="used">二手</option>
+    </select>
+  </div>
+
+  <div>
+    <button onclick="fetchBooks()">🔄 重新載入</button>
+  </div>
+
   <table id="booksTable">
     <thead>
       <tr>
@@ -44,6 +80,7 @@
         <th>書況</th>
         <th>已售出</th>
         <th>圖片</th>
+        <th>操作</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -67,18 +104,31 @@
       });
 
       const result = await response.json();
-      alert('書籍新增成功！');
+      alert('✅ 書籍新增成功！');
       this.reset();
       fetchBooks();
     });
 
     async function fetchBooks() {
-      const response = await fetch('https://cccbookbot-0c3d990eba99.herokuapp.com/api/books');
+      const response = await fetch('https://cccbookbot-0c3d990eba99.herokuapp.com');
       const books = await response.json();
+      renderBooks(books);
+    }
+
+    function renderBooks(books) {
       const tbody = document.querySelector('#booksTable tbody');
       tbody.innerHTML = '';
 
-      books.forEach(book => {
+      const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+      const conditionFilter = document.getElementById('conditionFilter').value;
+
+      const filteredBooks = books.filter(book => {
+        const matchesTitleOrAuthor = book.title.toLowerCase().includes(searchQuery) || book.author.toLowerCase().includes(searchQuery);
+        const matchesCondition = conditionFilter ? book.condition.toLowerCase() === conditionFilter : true;
+        return matchesTitleOrAuthor && matchesCondition;
+      });
+
+      filteredBooks.forEach(book => {
         const row = document.createElement('tr');
         row.innerHTML = `
           <td>${book.title}</td>
@@ -87,12 +137,23 @@
           <td>${book.condition}</td>
           <td>${book.is_sold ? '✔️' : '❌'}</td>
           <td><img src="${book.image_url}" alt="書籍圖片"></td>
+          <td><button onclick="addToCart('${book._id}')">加入購物車</button></td>
         `;
         tbody.appendChild(row);
       });
     }
 
-    fetchBooks(); // 頁面載入時自動顯示
+    function filterBooks() {
+      fetchBooks();
+    }
+
+    function addToCart(bookId) {
+      alert(`✅ 已將書籍加入購物車：${bookId}`);
+      // 在這裡可以寫入加入購物車的邏輯
+    }
+
+    // 初始載入書籍資料
+    fetchBooks();
   </script>
 </body>
 </html>
