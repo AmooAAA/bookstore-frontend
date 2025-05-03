@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>二手書店</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      max-width: 900px;
+    }
+    .form-group {
+      margin-bottom: 10px;
+    }
+    label {
+      display: block;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+    }
+    button {
+      padding: 10px 15px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .books-list {
+      margin-top: 30px;
+    }
+    .book-item {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f0f0f0;
+    }
+    img {
+      max-width: 100px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>二手書店</h1>
+
+  <h2>📚 新增書籍</h2>
+  <form id="bookForm">
+    <label>書名: <input type="text" name="title" required></label><br>
+    <label>作者: <input type="text" name="author" required></label><br>
+    <label>價格: <input type="number" name="price" required></label><br>
+    <label>書況: <input type="text" name="condition" required></label><br>
+    <label>說明: <input type="text" name="description" required></label><br>
+    <label>賣家 ID: <input type="text" name="seller_id" required></label><br>
+    <label>圖片網址:
+      <input type="text" name="image_url" id="image_url" value="https://tinypic.host/images/2025/04/07/-2025-04-07-144124.jpg">
+    </label><br>
+    <label>是否已售出:
+      <select name="is_sold">
+        <option value="false">否</option>
+        <option value="true">是</option>
+      </select>
+    </label><br>
+    <button type="submit">送出</button>
+  </form>
+
+  <h2>📖 書籍清單</h2>
+  <button onclick="fetchBooks()">🔄 重新載入</button>
+  <table id="booksTable">
+    <thead>
+      <tr>
+        <th>書名</th>
+        <th>作者</th>
+        <th>價格</th>
+        <th>書況</th>
+        <th>說明</th>
+        <th>已售出</th>
+        <th>圖片</th>
+        <th>刪除</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const apiUrl = 'http://localhost:5000/api/books';
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      window.location.href = 'login.html';
+    }
+
+    document.getElementById('bookForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      const data = {};
+      formData.forEach((value, key) => {
+        if (key === "price") value = parseFloat(value);
+        if (key === "is_sold") value = value === "true";
+        data[key] = value;
+      });
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (response.ok) {
+        alert('書籍新增成功！');
+        this.reset();
+        fetchBooks();
+      } else {
+        alert('新增書籍失敗');
+      }
+    });
+
+    async function fetchBooks() {
+      const response = await fetch(apiUrl, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const books = await response.json();
+      const tbody = document.querySelector('#booksTable tbody');
+      tbody.innerHTML = '';
+
+      books.forEach(book => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${book.title}</td>
+          <td>${book.author}</td>
+          <td>$${book.price}</td>
+          <td>${book.condition}</td>
+          <td>${book.description || ''}</td>
+          <td>${book.is_sold ? '✔️' : '❌'}</td>
+          <td><img src="${book.image_url}" alt="書籍圖片"></td>
+          <td><button onclick="deleteBook('${book._id}')">刪除</button></td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    async function deleteBook(bookId) {
+      const response = await fetch(`${apiUrl}/${bookId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        alert('書籍刪除成功');
+        fetchBooks();
+      } else {
+        alert('刪除書籍失敗');
+      }
+    }
+
+    fetchBooks();
+  </script>
+</body>
+</html>
