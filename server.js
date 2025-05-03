@@ -1,40 +1,41 @@
-require('dotenv').config(); // 載入 .env 檔案 
+require('dotenv').config(); // 載入 .env 檔案
+
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors'); // 引入 cors
-const jwt = require('jsonwebtoken'); // 用於生成 JWT
-const bcrypt = require('bcryptjs'); // 用於加密密碼
-const path = require('path'); // 加入這行
-const User = require('./models/User'); // 假設你已經有 User 模型
+const cors = require('cors');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const path = require('path');
+
+const User = require('./models/User');
 
 const app = express();
 
-// 使用 cors 中介軟體
-app.use(cors()); // 允許所有來源訪問 API
+// ===== Middlewares =====
+app.use(cors()); // 允許所有來源跨域訪問 API
+app.use(express.json()); // 解析 JSON 請求
+app.use(express.static('public')); // 提供 public 資料夾的靜態檔案
 
-// 中介軟體
-app.use(express.json());
-
-// 提供 public 資料夾中的靜態檔案
-app.use(express.static('public')); // 加這行
-
-// 連接 MongoDB
+// ===== Connect to MongoDB =====
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('✅ MongoDB connected'))
   .catch(err => console.error('❌ Database connection error:', err));
 
-// 引入路由
+// ===== Routes =====
+// 使用者路由
 const userRoutes = require('./routes/userRoutes');
 app.use('/api', userRoutes);
 
+// 書籍路由
 const bookRoutes = require('./routes/bookRoutes');
 app.use('/api', bookRoutes);
 
-// 引入購物車路由
+// 購物車路由
 const cartRoutes = require('./routes/cart');
 app.use('/api/cart', cartRoutes);
 
-// 登入 API
+// ===== Auth APIs =====
+// 登入
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
 
@@ -61,21 +62,18 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// 註冊 API
+// 註冊
 app.post('/api/register', async (req, res) => {
   const { username, email, password } = req.body;
 
   try {
-    // 檢查是否有相同的使用者名稱或郵箱
     const existingUser = await User.findOne({ $or: [{ username }, { email }] });
     if (existingUser) {
       return res.status(400).json({ success: false, message: '帳號或郵箱已存在' });
     }
 
-    // 密碼加密
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 創建新用戶
     const newUser = new User({
       username,
       email,
@@ -83,28 +81,25 @@ app.post('/api/register', async (req, res) => {
     });
 
     await newUser.save();
-
     res.status(201).json({ success: true, message: '註冊成功' });
   } catch (err) {
     res.status(500).json({ success: false, message: '伺服器錯誤' });
   }
 });
 
-// 根目錄顯示 bookForm.html
+// ===== Frontend Pages (HTML) =====
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'bookForm.html'));
 });
 
-// 顯示 login.html 頁面
 app.get('/login.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'Login.html'));
 });
 
-// 顯示 register.html 頁面
 app.get('/register.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'register.html'));
 });
 
-// 啟動伺服器
+// ===== Start Server =====
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
