@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>登入 Login</title>
+  <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
   <style>
     * {
       box-sizing: border-box;
@@ -12,7 +13,7 @@
     body {
       margin: 0;
       padding: 0;
-      background: #f3e9dd; /* 米色底 */
+      background: #f3e9dd;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -20,7 +21,7 @@
     }
 
     .login-container {
-      background: #fffaf3; /* 更淡的米白色 */
+      background: #fffaf3;
       padding: 2rem 2.5rem;
       border-radius: 16px;
       box-shadow: 0 8px 16px rgba(0,0,0,0.1);
@@ -30,14 +31,14 @@
     }
 
     h2 {
-      color: #6b4f3b; /* 深咖啡標題 */
+      color: #6b4f3b;
       margin-bottom: 1.5rem;
     }
 
     label {
       display: block;
       text-align: left;
-      color: #5c3e2f; /* 咖啡色文字 */
+      color: #5c3e2f;
       font-weight: bold;
       margin-top: 1rem;
     }
@@ -46,7 +47,7 @@
       width: 100%;
       padding: 0.5rem;
       margin-top: 0.3rem;
-      border: 1px solid #d8c3a5; /* 淡咖啡色邊框 */
+      border: 1px solid #d8c3a5;
       border-radius: 8px;
       background: #fffaf3;
       transition: border 0.3s;
@@ -54,13 +55,13 @@
 
     input:focus {
       outline: none;
-      border-color: #b08968; /* 咖啡中間色 */
+      border-color: #b08968;
     }
 
     button {
       margin-top: 1.5rem;
       padding: 0.6rem 1.2rem;
-      background: #a47148; /* 深咖啡色按鈕 */
+      background: #a47148;
       color: white;
       border: none;
       border-radius: 10px;
@@ -120,6 +121,28 @@
   </div>
 
   <script>
+    const liffId = "2007363323-BlP5rZeJ"; // <-- 替換成你自己的 LIFF ID
+
+    // 初始化 LIFF
+    window.onload = async function () {
+      try {
+        await liff.init({ liffId });
+
+        if (!liff.isLoggedIn()) {
+          liff.login();
+        } else {
+          const profile = await liff.getProfile();
+          console.log("已透過 LINE 登入：", profile.displayName);
+          // 你可以直接跳轉或顯示歡迎訊息
+          // window.location.href = 'bookForm.html';
+        }
+      } catch (err) {
+        console.error("LIFF 初始化失敗", err);
+        document.getElementById('message').textContent = '❌ LIFF 初始化錯誤';
+      }
+    };
+
+    // 處理表單登入
     document.getElementById('loginForm').addEventListener('submit', async function (e) {
       e.preventDefault();
 
@@ -143,8 +166,6 @@
           messageEl.style.color = 'green';
 
           localStorage.setItem('token', data.token);
-
-          // 登入成功後跳轉到 bookForm.html
           window.location.href = 'bookForm.html';
         } else {
           messageEl.textContent = '❌ ' + data.message;
