@@ -132,7 +132,6 @@
   <div style="text-align: center;">
     <button onclick="window.location.href='index.html'">📚 查看我的書籍</button>
     <button onclick="window.location.href='cart.html'">🛒 購物車</button>
-    <button onclick="logout()">🚪 登出</button>
   </div>
 
   <h2>📚 所有書籍</h2>
@@ -233,12 +232,6 @@
 
     function addToCart(bookId) {
       alert(`✅ 已將書籍加入購物車：${bookId}`);
-    }
-
-    function logout() {
-      localStorage.removeItem('token');
-      alert("已登出！");
-      window.location.href = 'login.html';
     }
 
     fetchBooks();
