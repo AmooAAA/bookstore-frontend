@@ -67,7 +67,7 @@ app.get('/', (req, res) => {
 
 // 顯示 login.html 頁面
 app.get('/login.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+  res.sendFile(path.join(__dirname, 'public', 'Login.html'));
 });
 
 // 啟動伺服器
