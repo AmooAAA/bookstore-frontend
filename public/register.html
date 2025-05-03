@@ -33,7 +33,7 @@
       const password = document.getElementById('password').value;
 
       try {
-        const response = await fetch('http://localhost:5000/api/register', { // 更正為正確的 API 路徑
+        const response = await fetch('https://cccbookbot-0c3d990eba99.herokuapp.com/api/books', { // 更正為正確的 API 路徑
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
