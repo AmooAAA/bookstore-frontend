@@ -167,18 +167,20 @@
   <script>
     // ⚙️ 初始化 LIFF
     async function initLiff() {
-      try {
-        await liff.init({ liffId: "2007363323-BlP5rZeJ" }); // ← 填入你的 LIFF ID！
-        if (!liff.isLoggedIn()) {
-          liff.login();
-        } else {
-          const profile = await liff.getProfile();
-          document.getElementById('sellerId').value = profile.userId; // 或 profile.displayName
-        }
-      } catch (err) {
-        console.error("LIFF 初始化失敗:", err);
-      }
+  try {
+    await liff.init({ liffId: "2007363323-BlP5rZeJ" }); // ← 換成你的 LIFF ID
+    if (!liff.isLoggedIn()) {
+      liff.login();  // ✅ 沒登入就強制登入（不能刪）
+    } else {
+      const profile = await liff.getProfile();
+      document.getElementById('sellerId').value = profile.userId;
     }
+  } catch (err) {
+    console.error("LIFF 初始化失敗:", err);
+    alert("LIFF 初始化失敗，請重新整理或聯絡管理員。");
+  }
+}
+
 
     initLiff();
 
