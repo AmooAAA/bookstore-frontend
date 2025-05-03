@@ -87,6 +87,41 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
+// Line 登入 API
+app.post('/api/loginByLine', async (req, res) => {
+  const { lineId, name, email } = req.body;
+
+  try {
+    // 查找是否已經有此 LINE ID 的用戶
+    let user = await User.findOne({ lineId });
+
+    if (!user) {
+      // 如果沒有，創建新用戶
+      user = new User({
+        lineId,
+        name,
+        email,
+        username: name,  // 可以根據需要設置
+        password: '',    // 若要使用 LINE 登入，密碼可以留空
+      });
+      await user.save();
+    }
+
+    // 使用 JWT 簽發 token
+    const token = jwt.sign(
+      { id: user._id, username: user.username, lineId: user.lineId },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
+    // 回傳 token 和成功訊息
+    res.json({ success: true, token });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: '伺服器錯誤' });
+  }
+});
+
 // ===== Frontend Pages (HTML) =====
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'bookForm.html'));
