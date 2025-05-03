@@ -1,20 +1,21 @@
-require('dotenv').config(); // 載入 .env 檔案
+require('dotenv').config(); // 載入 .env 檔案 
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors'); // 引入 cors
 const jwt = require('jsonwebtoken'); // 用於生成 JWT
 const bcrypt = require('bcryptjs'); // 用於加密密碼
+const path = require('path'); // 加入這行
 
 const app = express();
 
 // 使用 cors 中介軟體
-app.use(cors()); // 這樣就允許所有來源訪問 API
+app.use(cors()); // 允許所有來源訪問 API
 
 // 中介軟體
 app.use(express.json());
 
-// 確保 .env 設定的 MONGODB_URI 被正確讀取
-console.log('MONGODB_URI:', process.env.MONGODB_URI);  // 檢查 .env 檔案是否正確讀取
+// 提供 public 資料夾中的靜態檔案
+app.use(express.static('public')); // 加這行
 
 // 連接 MongoDB
 mongoose.connect(process.env.MONGODB_URI)
@@ -37,30 +38,31 @@ app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    // 查找使用者
     const user = await User.findOne({ username });
     if (!user) {
       return res.status(400).json({ success: false, message: '帳號不存在' });
     }
 
-    // 比對密碼
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ success: false, message: '密碼錯誤' });
     }
 
-    // 產生 JWT
-    const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign(
+      { id: user._id, username: user.username },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
 
-    res.json({ success: true, token });  // 回傳 token
+    res.json({ success: true, token });
   } catch (err) {
     res.status(500).json({ success: false, message: '伺服器錯誤' });
   }
 });
 
-// 測試路由
+// 根目錄顯示 bookForm.html
 app.get('/', (req, res) => {
-  res.send('Hello from server!');
+  res.sendFile(path.join(__dirname, 'public', 'bookForm.html'));
 });
 
 // 啟動伺服器
