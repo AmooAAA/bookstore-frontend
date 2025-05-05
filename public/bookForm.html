@@ -1,15 +1,14 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>二手書上架</title>
-  <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script> <!-- LIFF SDK -->
+  <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 20px;
-      padding: 0;
       background-color: #f4f4f9;
     }
     h1, h2 {
@@ -17,18 +16,19 @@
       color: #333;
     }
     form {
-      margin: 20px 0;
-      padding: 20px;
       background-color: #fff;
+      padding: 20px;
       border-radius: 8px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      margin: 0 auto;
     }
     form div {
       margin-bottom: 15px;
     }
     label {
-      display: block;
       font-weight: bold;
+      display: block;
       margin-bottom: 5px;
     }
     input[type="text"], input[type="number"], select {
@@ -52,16 +52,14 @@
     }
     #searchInput, #conditionFilter {
       width: 48%;
-      margin-right: 4%;
       padding: 10px;
       font-size: 16px;
       border: 1px solid #ddd;
       border-radius: 5px;
       margin-top: 20px;
     }
-    #conditionFilter {
-      width: 48%;
-      margin-right: 0;
+    #searchInput {
+      margin-right: 4%;
     }
     table {
       width: 100%;
@@ -81,55 +79,56 @@
       width: 100px;
       height: auto;
     }
+    .center {
+      text-align: center;
+    }
   </style>
 </head>
 <body>
   <h1>📖 新增書籍</h1>
-  
-  <div>
-    <form id="bookForm">
-      <div>
-        <label>書名</label>
-        <input type="text" name="title" required>
-      </div>
-      <div>
-        <label>作者</label>
-        <input type="text" name="author" required>
-      </div>
-      <div>
-        <label>價格</label>
-        <input type="number" name="price" required>
-      </div>
-      <div>
-        <label>書況</label>
-        <input type="text" name="condition" required>
-      </div>
-      <div>
-        <label>說明</label>
-        <input type="text" name="description" required>
-      </div>
-      <div>
-        <label>賣家 ID（自動帶入）</label>
-        <input type="text" name="seller_id" id="sellerId" readonly>
-      </div>
-      <div>
-        <label>圖片網址</label>
-        <input type="text" name="image_url" value="https://tinypic.host/images/2025/04/07/-2025-04-07-144124.jpg">
-      </div>
-      <div>
-        <label>是否已售出</label>
-        <select name="is_sold">
-          <option value="false">否</option>
-          <option value="true">是</option>
-        </select>
-      </div>
-      <div>
-        <button type="submit">📥 送出</button>
-      </div>
-    </form>
-  </div>
 
-  <div style="text-align: center;">
+  <form id="bookForm">
+    <div>
+      <label>書名</label>
+      <input type="text" name="title" required />
+    </div>
+    <div>
+      <label>作者</label>
+      <input type="text" name="author" required />
+    </div>
+    <div>
+      <label>價格</label>
+      <input type="number" name="price" required />
+    </div>
+    <div>
+      <label>書況</label>
+      <input type="text" name="condition" required />
+    </div>
+    <div>
+      <label>說明</label>
+      <input type="text" name="description" required />
+    </div>
+    <div>
+      <label>賣家 ID（自動帶入）</label>
+      <input type="text" name="seller_id" id="sellerId" readonly />
+    </div>
+    <div>
+      <label>圖片網址</label>
+      <input type="text" name="image_url" value="https://tinypic.host/images/2025/04/07/-2025-04-07-144124.jpg" />
+    </div>
+    <div>
+      <label>是否已售出</label>
+      <select name="is_sold">
+        <option value="false">否</option>
+        <option value="true">是</option>
+      </select>
+    </div>
+    <div class="center">
+      <button type="submit">📥 送出</button>
+    </div>
+  </form>
+
+  <div class="center" style="margin: 20px 0;">
     <button onclick="window.location.href='index.html'">📚 查看我的書籍</button>
     <button onclick="window.location.href='cart.html'">🛒 購物車</button>
     <button onclick="logout()">🚪 登出</button>
@@ -137,8 +136,8 @@
 
   <h2>📚 所有書籍</h2>
 
-  <div style="text-align: center;">
-    <input type="text" id="searchInput" placeholder="搜尋書名或作者..." oninput="filterBooks()">
+  <div class="center">
+    <input type="text" id="searchInput" placeholder="搜尋書名或作者..." oninput="filterBooks()" />
     <select id="conditionFilter" onchange="filterBooks()">
       <option value="">過濾書籍狀況</option>
       <option value="new">全新</option>
@@ -146,7 +145,7 @@
     </select>
   </div>
 
-  <div style="text-align: center;">
+  <div class="center">
     <button onclick="fetchBooks()">🔄 重新載入</button>
   </div>
 
@@ -169,12 +168,12 @@
     // ⚙️ 初始化 LIFF
     async function initLiff() {
       try {
-        await liff.init({ liffId: "你的 LIFF ID" }); // ← 填入你的 LIFF ID！
+        await liff.init({ liffId: "你的 LIFF ID" }); // ← 換成你的 LIFF ID
         if (!liff.isLoggedIn()) {
           liff.login();
         } else {
           const profile = await liff.getProfile();
-          document.getElementById('sellerId').value = profile.userId; // 或 profile.displayName
+          document.getElementById('sellerId').value = profile.userId;
         }
       } catch (err) {
         console.error("LIFF 初始化失敗:", err);
@@ -183,8 +182,8 @@
 
     initLiff();
 
-    // 📬 提交表單
-    document.getElementById('bookForm').addEventListener('submit', async function(e) {
+    // 📬 表單送出
+    document.getElementById('bookForm').addEventListener('submit', async function (e) {
       e.preventDefault();
       const formData = new FormData(this);
       const data = {};
@@ -201,11 +200,12 @@
       });
 
       const result = await response.json();
-      alert('書籍新增成功！');
+      alert('✅ 書籍新增成功！');
       this.reset();
       fetchBooks();
     });
 
+    // 📦 取得所有書籍
     async function fetchBooks() {
       const response = await fetch('https://cccbookbot-0c3d990eba99.herokuapp.com/api/books');
       const books = await response.json();
@@ -220,28 +220,31 @@
           <td>$${book.price}</td>
           <td>${book.condition}</td>
           <td>${book.is_sold ? '✔️' : '❌'}</td>
-          <td><img src="${book.image_url}" alt="書籍圖片"></td>
+          <td><img src="${book.image_url}" alt="書籍圖片" /></td>
           <td><button onclick="addToCart('${book._id}')">加入購物車</button></td>
         `;
         tbody.appendChild(row);
       });
     }
 
+    // 🔍 書籍過濾（可擴充）
     function filterBooks() {
-      fetchBooks();
+      fetchBooks(); // 未加篩選條件，如需完整搜尋功能可再擴充
     }
 
+    // 🛒 加入購物車（目前僅提示，可串購物車功能）
     function addToCart(bookId) {
       alert(`✅ 已將書籍加入購物車：${bookId}`);
     }
 
+    // 🚪 登出功能
     function logout() {
       localStorage.removeItem('token');
       alert("已登出！");
       window.location.href = 'login.html';
     }
 
-    fetchBooks();
+    fetchBooks(); // 初始載入書籍
   </script>
 </body>
 </html>
