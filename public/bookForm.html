@@ -11,6 +11,13 @@
       background-color: #f9f9f9;
     }
 
+    nav a {
+      margin-right: 1rem;
+      font-size: 1.1rem;
+      text-decoration: none;
+      color: #0077cc;
+    }
+
     h1 {
       color: #333;
     }
@@ -49,8 +56,15 @@
   </style>
 </head>
 <body>
-  <h1>📑 書籍搜尋與篩選</h1>
 
+  <!-- 導覽區：購物車與我的書籍 -->
+  <nav style="margin-bottom: 2rem;">
+    <a href="cart.html">🛒 查看購物車</a> |
+    <a href="myBooks.html">📦 查看我的書籍</a>
+  </nav>
+
+  <!-- 搜尋表單 -->
+  <h1>📑 書籍搜尋與篩選</h1>
   <div>
     <form id="filterForm">
       <div>
@@ -92,6 +106,7 @@
     </form>
   </div>
 
+  <!-- 書籍清單 -->
   <h1>📚 書籍清單</h1>
   <table id="booksTable">
     <thead>
