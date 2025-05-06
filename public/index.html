@@ -174,7 +174,10 @@
       const tbody = document.querySelector('#booksTable tbody');
       tbody.innerHTML = '';
 
-      books.forEach(book => {
+      // 篩選出只有當前用戶上架的書籍
+      const userBooks = books.filter(book => book.seller_id === currentUserId);
+
+      userBooks.forEach(book => {
         const row = document.createElement('tr');
         let deleteBtn = '';
         if (book.seller_id === currentUserId) {
