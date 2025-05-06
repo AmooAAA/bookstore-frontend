@@ -3,7 +3,7 @@ const router = express.Router();
 const Cart = require('../models/Cart');
 const Book = require('../models/Book');
 
-// 測試API是否正常運行
+// 這裡是測試用的 GET 路由
 router.get('/', (req, res) => {
   res.send('Cart API is working');
 });
@@ -14,6 +14,14 @@ router.post('/add', async (req, res) => {
   console.log('Received data:', { userId, bookId, quantity });
 
   try {
+    // 查找書籍價格
+    const book = await Book.findById(bookId);
+    if (!book) {
+      return res.status(404).json({ message: '書籍未找到' });
+    }
+
+    const price = book.price;
+
     // 查找用户的购物车
     let cart = await Cart.findOne({ userId });
 
@@ -22,7 +30,8 @@ router.post('/add', async (req, res) => {
       console.log('Cart not found, creating new cart...');
       cart = new Cart({
         userId,
-        items: [{ bookId, quantity }]
+        items: [{ bookId, quantity, price }],
+        totalPrice: price * quantity
       });
       await cart.save();
       return res.status(200).json(cart);
@@ -33,17 +42,19 @@ router.post('/add', async (req, res) => {
     if (existingItem) {
       // 如果书籍已经存在，更新数量
       existingItem.quantity += quantity;
+      existingItem.price = price;  // 更新書籍的價格
     } else {
       // 否则，新增书籍
-      cart.items.push({ bookId, quantity });
+      cart.items.push({ bookId, quantity, price });
     }
 
     // 保存购物车
     await cart.save();
+    console.log('Cart updated:', cart);
     res.status(200).json(cart);
   } catch (error) {
     console.error('Error adding to cart:', error);
-    res.status(500).json({ message: '加入購物車時發生錯誤' });
+    res.status(500).json({ message: '加入購物車時發生錯誤', error: error.message });
   }
 });
 
