@@ -3,6 +3,7 @@ const router = express.Router();
 const Cart = require('../models/Cart');
 const Book = require('../models/Book');
 
+// 測試API是否正常運行
 router.get('/', (req, res) => {
   res.send('Cart API is working');
 });
