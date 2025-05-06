@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>我的購物車</title>
   <style>
-    /* 與上架頁面相似，這裡簡化了樣式 */
     body {
       font-family: "Segoe UI", sans-serif;
       background-color: #fdf8f1;
@@ -55,7 +54,7 @@
     button:hover {
       background-color: #8e5c34;
     }
-    
+
     .center {
       text-align: center;
       margin-top: 20px;
@@ -77,8 +76,6 @@
       <tr>
         <th>書名</th>
         <th>價格</th>
-        <th>數量</th>
-        <th>總價</th>
         <th>操作</th>
       </tr>
     </thead>
@@ -94,55 +91,69 @@
   </div>
 
   <script>
-    const cart = [];
+    let token = localStorage.getItem('token');
+    let currentUserId = localStorage.getItem('user_id');
 
-    // 範例：假設這是已經加入購物車的書籍資料
-    const sampleCartData = [
-      { title: '書籍 1', price: 300, quantity: 1 },
-      { title: '書籍 2', price: 250, quantity: 2 },
-    ];
+    async function fetchCart() {
+      try {
+        const res = await fetch(`https://cccbookbot-0c3d990eba99.herokuapp.com/api/cart/${currentUserId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
 
-    function renderCart() {
+        if (!res.ok) throw new Error("載入購物車失敗");
+
+        const cartItems = await res.json();
+        renderCart(cartItems);
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    function renderCart(items) {
       const tbody = document.querySelector('#cartTable tbody');
       tbody.innerHTML = '';
       let total = 0;
 
-      sampleCartData.forEach((item, index) => {
+      items.forEach(item => {
         const row = document.createElement('tr');
-        const totalPrice = item.price * item.quantity;
-        total += totalPrice;
         row.innerHTML = `
-          <td>${item.title}</td>
-          <td>$${item.price}</td>
-          <td>
-            <input type="number" value="${item.quantity}" min="1" onchange="updateQuantity(${index}, this.value)">
-          </td>
-          <td>$${totalPrice}</td>
-          <td><button onclick="removeFromCart(${index})">移除</button></td>
+          <td>${item.book.title}</td>
+          <td>$${item.book.price}</td>
+          <td><button onclick="removeFromCart('${item.book._id}')">移除</button></td>
         `;
+        total += item.book.price;
         tbody.appendChild(row);
       });
 
       document.getElementById('totalPrice').innerText = total;
     }
 
-    function updateQuantity(index, newQuantity) {
-      sampleCartData[index].quantity = parseInt(newQuantity);
-      renderCart();
-    }
+    async function removeFromCart(bookId) {
+      try {
+        const res = await fetch(`https://cccbookbot-0c3d990eba99.herokuapp.com/api/cart/${bookId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ user_id: currentUserId })
+        });
 
-    function removeFromCart(index) {
-      sampleCartData.splice(index, 1);
-      renderCart();
+        if (!res.ok) throw new Error("移除失敗");
+        await fetchCart(); // 刷新購物車
+      } catch (err) {
+        alert(err.message);
+      }
     }
 
     function checkout() {
-      // 這裡可以將購物車資料傳到伺服器進行結帳處理
-      alert("已完成結帳！");
+      alert("💸（模擬）已完成結帳，感謝您的購買！");
     }
 
-    // 頁面載入時渲染購物車
-    renderCart();
+    // 載入購物車資料
+    fetchCart();
   </script>
 </body>
 </html>
