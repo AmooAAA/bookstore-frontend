@@ -201,36 +201,36 @@
     }
 
     async function addToCart(bookId) {
-  const userId = localStorage.getItem("user_id");
-  if (!userId) {
-    alert("請先登入 LINE");
-    return;
-  }
+      const userId = localStorage.getItem("user_id");
+      if (!userId) {
+        alert("請先登入 LINE");
+        return;
+      }
 
-  console.log("Sending data to backend:", { userId, bookId, quantity: 1 });
+      console.log("Sending data to backend:", { userId, bookId, quantity: 1 });
 
-  try {
-    const res = await fetch("https://cccbookbot-0c3d990eba99.herokuapp.com/api/cart/add", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ userId, bookId, quantity: 1 })
-    });
+      try {
+        const res = await fetch("https://cccbookbot-0c3d990eba99.herokuapp.com/api/cart/add", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ userId, bookId, quantity: 1 })
+        });
 
-    const result = await res.json();
-    console.log("Response from backend:", result);
+        const result = await res.json();
+        console.log("Response from backend:", result);
 
-    if (res.ok) {
-      alert("已加入購物車！");
-    } else {
-      alert(result.message || "加入購物車失敗");
+        if (res.ok) {
+          alert("已加入購物車！");
+        } else {
+          alert(result.message || "加入購物車失敗");
+        }
+      } catch (error) {
+        console.error("錯誤：", error);
+        alert("無法連接伺服器，請稍後再試");
+      }
     }
-  } catch (error) {
-    console.error("錯誤：", error);
-    alert("無法連接伺服器，請稍後再試");
-  }
-}
   </script>
 </body>
 </html>
