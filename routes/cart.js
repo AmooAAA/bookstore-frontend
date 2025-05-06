@@ -6,10 +6,12 @@ const Book = require('../models/Book');
 // 添加書籍到購物車
 router.post('/add', async (req, res) => {
   const { userId, bookId, quantity } = req.body;
+  console.log('Received data:', { userId, bookId, quantity });
 
   try {
     const cart = await Cart.findOne({ userId });
     if (!cart) {
+      console.log('Cart not found, creating new cart...');
       const newCart = new Cart({
         userId,
         items: [{ bookId, quantity }]
@@ -27,10 +29,11 @@ router.post('/add', async (req, res) => {
     await cart.save();
     res.status(200).json(cart);
   } catch (error) {
-    console.error('錯誤:', error);
+    console.error('Error adding to cart:', error);
     res.status(500).json({ message: '加入購物車時發生錯誤' });
   }
 });
+
 
 // 更新購物車中的書籍數量
 router.put('/update', async (req, res) => {
