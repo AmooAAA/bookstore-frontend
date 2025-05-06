@@ -17,7 +17,7 @@ router.post('/add', async (req, res) => {
     // 查找書籍價格
     const book = await Book.findById(bookId);
     if (!book) {
-      return res.status(404).json({ message: '書籍未找到' });
+      return res.status(404).json({ message: `書籍 ${bookId} 未找到` });
     }
 
     const price = book.price;
@@ -33,8 +33,16 @@ router.post('/add', async (req, res) => {
         items: [{ bookId, quantity, price }],
         totalPrice: price * quantity
       });
-      await cart.save();
-      return res.status(200).json(cart);
+
+      // 嘗試儲存購物車
+      try {
+        await cart.save();
+        console.log('New cart created and saved:', cart);
+        return res.status(200).json(cart);
+      } catch (error) {
+        console.error('Error saving new cart:', error);
+        return res.status(500).json({ message: '創建購物車時發生錯誤', error: error.message });
+      }
     }
 
     // 查找购物车中的书籍
@@ -43,20 +51,40 @@ router.post('/add', async (req, res) => {
       // 如果书籍已经存在，更新数量
       existingItem.quantity += quantity;
       existingItem.price = price;  // 更新書籍的價格
+
+      // 嘗試儲存購物車
+      try {
+        await cart.save();
+        console.log('Cart updated:', cart);
+        res.status(200).json(cart);
+      } catch (error) {
+        console.error('Error updating cart:', error);
+        return res.status(500).json({ message: '更新購物車時發生錯誤', error: error.message });
+      }
     } else {
       // 否则，新增书籍
       cart.items.push({ bookId, quantity, price });
-    }
 
-    // 保存购物车
-    await cart.save();
-    console.log('Cart updated:', cart);
-    res.status(200).json(cart);
+      // 嘗試儲存購物車
+      try {
+        await cart.save();
+        console.log('Cart updated with new item:', cart);
+        res.status(200).json(cart);
+      } catch (error) {
+        console.error('Error saving updated cart:', error);
+        return res.status(500).json({ message: '加入書籍到購物車時發生錯誤', error: error.message });
+      }
+    }
   } catch (error) {
     console.error('Error adding to cart:', error);
-    res.status(500).json({ message: '加入購物車時發生錯誤', error: error.message });
+    // 更詳細的錯誤處理
+    if (error.code) {
+      console.error('MongoDB error code:', error.code);
+    }
+    res.status(500).json({ message: '加入購物車時發生錯誤', error: error.message, code: error.code });
   }
 });
+
 
 // 更新購物車中的書籍數量
 router.put('/update', async (req, res) => {
