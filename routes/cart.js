@@ -3,6 +3,10 @@ const router = express.Router();
 const Cart = require('../models/Cart');
 const Book = require('../models/Book');
 
+router.get('/', (req, res) => {
+  res.send('Cart API is working');
+});
+
 // 添加書籍到購物車
 router.post('/add', async (req, res) => {
   const { userId, bookId, quantity } = req.body;
