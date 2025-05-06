@@ -208,15 +208,15 @@
       }
 
       try {
-        const res = await fetch("https://cccbookbot-0c3d990eba99.herokuapp.com/api/cart", {
+        const res = await fetch("https://cccbookbot-0c3d990eba99.herokuapp.com/api/cart/add", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({ user_id: userId, book_id: bookId })
+          body: JSON.stringify({ userId, bookId, quantity: 1 })
         });
 
-        const result = await res.json(); // 取得後端的回應結果
+        const result = await res.json();
 
         if (res.ok) {
           alert("已加入購物車！");
