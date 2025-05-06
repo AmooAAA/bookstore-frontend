@@ -15,6 +15,7 @@
     }
     label {
       display: block;
+      margin-top: 10px;
     }
     input, textarea, select {
       width: 100%;
@@ -33,11 +34,6 @@
     }
     .books-list {
       margin-top: 30px;
-    }
-    .book-item {
-      border: 1px solid #ccc;
-      padding: 10px;
-      margin-bottom: 10px;
     }
     table {
       border-collapse: collapse;
@@ -65,21 +61,32 @@
 
   <h2>📚 新增書籍</h2>
   <form id="bookForm">
-    <label>書名: <input type="text" name="title" required></label><br>
-    <label>作者: <input type="text" name="author" required></label><br>
-    <label>價格: <input type="number" name="price" required></label><br>
-    <label>書況: <input type="text" name="condition" required></label><br>
-    <label>說明: <input type="text" name="description" required></label><br>
-    <label>賣家 ID: <input type="text" name="seller_id" required></label><br>
-    <label>圖片網址:
-      <input type="text" name="image_url" id="image_url" value="https://tinypic.host/images/2025/04/07/-2025-04-07-144124.jpg">
-    </label><br>
-    <label>是否已售出:
-      <select name="is_sold">
-        <option value="false">否</option>
-        <option value="true">是</option>
-      </select>
-    </label><br>
+    <label for="title">書名:</label>
+    <input type="text" id="title" name="title" required>
+
+    <label for="author">作者:</label>
+    <input type="text" id="author" name="author" required>
+
+    <label for="price">價格:</label>
+    <input type="number" id="price" name="price" required>
+
+    <label for="condition">書況:</label>
+    <input type="text" id="condition" name="condition" required>
+
+    <label for="description">說明:</label>
+    <textarea id="description" name="description" required></textarea>
+
+    <input type="hidden" id="seller_id" name="seller_id">
+
+    <label for="image_url">圖片網址:</label>
+    <input type="text" id="image_url" name="image_url" value="https://tinypic.host/images/2025/04/07/-2025-04-07-144124.jpg">
+
+    <label for="is_sold">是否已售出:</label>
+    <select id="is_sold" name="is_sold">
+      <option value="false">否</option>
+      <option value="true">是</option>
+    </select>
+
     <button type="submit">送出</button>
   </form>
 
@@ -109,6 +116,19 @@
       window.location.href = 'login.html';
     }
 
+    // 解析 token，假設 payload 含有 user_id
+    function getUserIdFromToken(token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.user_id || payload.id || ''; // 根據後端設計調整
+      } catch (err) {
+        console.error('Invalid token:', err);
+        return '';
+      }
+    }
+
+    document.getElementById('seller_id').value = getUserIdFromToken(token);
+
     document.getElementById('bookForm').addEventListener('submit', async function (e) {
       e.preventDefault();
       const formData = new FormData(this);
@@ -119,21 +139,27 @@
         data[key] = value;
       });
 
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(data)
-      });
+      try {
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify(data)
+        });
 
-      if (response.ok) {
-        alert('書籍新增成功！');
-        this.reset();
-        fetchBooks();
-      } else {
-        alert('新增書籍失敗');
+        if (response.ok) {
+          alert('書籍新增成功！');
+          this.reset();
+          document.getElementById('seller_id').value = getUserIdFromToken(token); // reset 時重填 seller_id
+          fetchBooks();
+        } else {
+          const errorText = await response.text();
+          alert('新增書籍失敗：' + errorText);
+        }
+      } catch (error) {
+        alert('錯誤：' + error.message);
       }
     });
 

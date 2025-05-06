@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Book Store</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -62,6 +63,8 @@
     <a href="cart.html">🛒 查看購物車</a> |
     <a href="index.html">📦 查看我的書籍</a>
   </nav>
+
+  <div>👤 歡迎，<span id="lineName">使用者</span>！</div>
 
   <!-- 搜尋表單 -->
   <h1>📑 書籍搜尋與篩選</h1>
@@ -124,7 +127,29 @@
   </table>
 
   <script>
+    // LIFF 初始化與登入
+    async function initLIFF() {
+      try {
+        await liff.init({ liffId: "2007363323-BlP5rZeJ" });
+
+        if (!liff.isLoggedIn()) {
+          liff.login();
+        } else {
+          const profile = await liff.getProfile();
+          const userId = profile.userId;
+          const displayName = profile.displayName;
+
+          localStorage.setItem('user_id', userId);
+          document.getElementById('lineName').innerText = displayName;
+        }
+      } catch (err) {
+        console.error("LIFF 初始化失敗", err);
+        alert("LINE 登入失敗，請重新整理");
+      }
+    }
+
     document.addEventListener("DOMContentLoaded", async () => {
+      await initLIFF();
       await filterBooks();
     });
 
@@ -178,7 +203,7 @@
     async function addToCart(bookId) {
       const userId = localStorage.getItem("user_id");
       if (!userId) {
-        alert("請先登入");
+        alert("請先登入 LINE");
         return;
       }
 
