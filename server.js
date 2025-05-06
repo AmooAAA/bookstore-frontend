@@ -8,6 +8,7 @@ const bcrypt = require('bcryptjs');
 const path = require('path');
 
 const User = require('./models/User');
+const Cart = require('./models/Cart'); // 引入 Cart 模型
 
 const app = express();
 
@@ -119,6 +120,59 @@ app.post('/api/loginByLine', async (req, res) => {
     res.json({ success: true, token });
   } catch (err) {
     console.error(err);
+    res.status(500).json({ success: false, message: '伺服器錯誤' });
+  }
+});
+
+// ===== Cart APIs =====
+
+// 添加書籍到購物車
+app.post('/api/cart/add', async (req, res) => {
+  const { userId, bookId, quantity } = req.body;
+
+  try {
+    // 查找購物車
+    let cart = await Cart.findOne({ userId });
+
+    // 如果購物車不存在，創建一個新購物車
+    if (!cart) {
+      cart = new Cart({
+        userId,
+        items: [{ bookId, quantity, price: req.body.price }],
+      });
+    } else {
+      // 如果購物車存在，檢查該書籍是否已經在購物車中
+      const itemIndex = cart.items.findIndex(item => item.bookId.toString() === bookId);
+
+      if (itemIndex === -1) {
+        // 如果書籍不在購物車中，添加新書籍
+        cart.items.push({ bookId, quantity, price: req.body.price });
+      } else {
+        // 如果書籍已經在購物車中，更新數量
+        cart.items[itemIndex].quantity += quantity;
+      }
+    }
+
+    // 保存購物車
+    await cart.save();
+    res.status(200).json({ success: true, cart });
+  } catch (err) {
+    res.status(500).json({ success: false, message: '伺服器錯誤' });
+  }
+});
+
+// 獲取購物車內容
+app.get('/api/cart/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const cart = await Cart.findOne({ userId }).populate('items.bookId');
+    if (!cart) {
+      return res.status(404).json({ success: false, message: '購物車不存在' });
+    }
+
+    res.status(200).json({ success: true, cart });
+  } catch (err) {
     res.status(500).json({ success: false, message: '伺服器錯誤' });
   }
 });
