@@ -94,32 +94,27 @@ app.post('/api/loginByLine', async (req, res) => {
   const { lineId, name, email } = req.body;
 
   try {
-    // 查找是否已經有此 LINE ID 的用戶
     let user = await User.findOne({ lineId });
 
     if (!user) {
-      // 如果沒有，創建新用戶
       user = new User({
         lineId,
         name,
         email,
-        username: name,  // 可以根據需要設置
-        password: '',    // 若要使用 LINE 登入，密碼可以留空
+        username: name,
+        password: '',  // 如果是使用 LINE 登入，密碼可以設為空
       });
       await user.save();
     }
 
-    // 使用 JWT 簽發 token
     const token = jwt.sign(
       { id: user._id, username: user.username, lineId: user.lineId },
       process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
 
-    // 回傳 token 和成功訊息
     res.json({ success: true, token });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ success: false, message: '伺服器錯誤' });
   }
 });
@@ -128,32 +123,26 @@ app.post('/api/loginByLine', async (req, res) => {
 
 // 添加書籍到購物車
 app.post('/api/cart/add', async (req, res) => {
-  const { userId, bookId, quantity } = req.body;
+  const { userId, bookId, quantity, price } = req.body;
 
   try {
-    // 查找購物車
     let cart = await Cart.findOne({ userId });
 
-    // 如果購物車不存在，創建一個新購物車
     if (!cart) {
       cart = new Cart({
         userId,
-        items: [{ bookId, quantity, price: req.body.price }],
+        items: [{ bookId, quantity, price }],
       });
     } else {
-      // 如果購物車存在，檢查該書籍是否已經在購物車中
       const itemIndex = cart.items.findIndex(item => item.bookId.toString() === bookId);
 
       if (itemIndex === -1) {
-        // 如果書籍不在購物車中，添加新書籍
-        cart.items.push({ bookId, quantity, price: req.body.price });
+        cart.items.push({ bookId, quantity, price });
       } else {
-        // 如果書籍已經在購物車中，更新數量
         cart.items[itemIndex].quantity += quantity;
       }
     }
 
-    // 保存購物車
     await cart.save();
     res.status(200).json({ success: true, cart });
   } catch (err) {
