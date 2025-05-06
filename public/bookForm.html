@@ -207,18 +207,25 @@
         return;
       }
 
-      const res = await fetch("https://cccbookbot-0c3d990eba99.herokuapp.com/api/cart", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ user_id: userId, book_id: bookId })
-      });
+      try {
+        const res = await fetch("https://cccbookbot-0c3d990eba99.herokuapp.com/api/cart", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ user_id: userId, book_id: bookId })
+        });
 
-      if (res.ok) {
-        alert("已加入購物車！");
-      } else {
-        alert("加入購物車失敗");
+        const result = await res.json(); // 取得後端的回應結果
+
+        if (res.ok) {
+          alert("已加入購物車！");
+        } else {
+          alert(result.message || "加入購物車失敗");
+        }
+      } catch (error) {
+        console.error("錯誤：", error);
+        alert("無法連接伺服器，請稍後再試");
       }
     }
   </script>
