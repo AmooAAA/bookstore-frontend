@@ -3,87 +3,89 @@
 <head>
   <meta charset="UTF-8">
   <title>我的購物車</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    /* 與上架頁面相似，這裡簡化了樣式 */
     body {
       font-family: "Segoe UI", sans-serif;
       background-color: #fdf8f1;
       color: #4b3621;
-      max-width: 960px;
-      margin: 40px auto;
-      padding: 20px;
+      padding: 16px;
+      margin: 0;
     }
 
     h1 {
       text-align: center;
+      margin-bottom: 20px;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 25px;
+    .cart-item {
       background-color: #fffef9;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    th, td {
+      border: 1px solid #e0d3c2;
+      border-radius: 10px;
       padding: 12px;
-      border-bottom: 1px solid #e0d3c2;
-      text-align: left;
+      margin-bottom: 12px;
     }
 
-    th {
-      background-color: #eee1d1;
-      color: #4a3723;
+    .cart-item-title {
+      font-weight: bold;
+      margin-bottom: 6px;
     }
 
-    tr:hover {
-      background-color: #f8f1e7;
+    .cart-item-info {
+      display: flex;
+      flex-direction: column;
+      font-size: 0.95em;
+    }
+
+    .cart-item-info span {
+      margin-bottom: 4px;
+    }
+
+    .cart-item-actions {
+      margin-top: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    input[type="number"] {
+      width: 60px;
+      padding: 4px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
     }
 
     button {
       background-color: #a47149;
       color: #fff;
       border: none;
-      padding: 10px 16px;
+      padding: 8px 12px;
       border-radius: 6px;
       cursor: pointer;
-      transition: background-color 0.3s;
+      font-size: 0.95em;
     }
 
     button:hover {
       background-color: #8e5c34;
     }
-    
-    .center {
-      text-align: center;
-      margin-top: 20px;
-    }
 
     #total {
-      font-size: 1.2em;
+      font-size: 1.1em;
       font-weight: bold;
       text-align: right;
       margin-top: 20px;
+    }
+
+    .center {
+      text-align: center;
+      margin-top: 16px;
     }
   </style>
 </head>
 <body>
   <h1>🛒 我的購物車</h1>
 
-  <table id="cartTable">
-    <thead>
-      <tr>
-        <th>書名</th>
-        <th>價格</th>
-        <th>數量</th>
-        <th>總價</th>
-        <th>操作</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <div id="cartContainer"></div>
 
   <div id="total">
     總金額: $<span id="totalPrice">0</span>
@@ -94,33 +96,36 @@
   </div>
 
   <script>
-    const cart = [];
-
-    // 範例：假設這是已經加入購物車的書籍資料
     const sampleCartData = [
       { title: '書籍 1', price: 300, quantity: 1 },
       { title: '書籍 2', price: 250, quantity: 2 },
     ];
 
     function renderCart() {
-      const tbody = document.querySelector('#cartTable tbody');
-      tbody.innerHTML = '';
+      const container = document.getElementById('cartContainer');
+      container.innerHTML = '';
       let total = 0;
 
       sampleCartData.forEach((item, index) => {
-        const row = document.createElement('tr');
-        const totalPrice = item.price * item.quantity;
-        total += totalPrice;
-        row.innerHTML = `
-          <td>${item.title}</td>
-          <td>$${item.price}</td>
-          <td>
-            <input type="number" value="${item.quantity}" min="1" onchange="updateQuantity(${index}, this.value)">
-          </td>
-          <td>$${totalPrice}</td>
-          <td><button onclick="removeFromCart(${index})">移除</button></td>
+        const itemTotal = item.price * item.quantity;
+        total += itemTotal;
+
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'cart-item';
+        itemDiv.innerHTML = `
+          <div class="cart-item-title">${item.title}</div>
+          <div class="cart-item-info">
+            <span>價格：$${item.price}</span>
+            <span>數量：
+              <input type="number" value="${item.quantity}" min="1" onchange="updateQuantity(${index}, this.value)">
+            </span>
+            <span>總價：$${itemTotal}</span>
+          </div>
+          <div class="cart-item-actions">
+            <button onclick="removeFromCart(${index})">移除</button>
+          </div>
         `;
-        tbody.appendChild(row);
+        container.appendChild(itemDiv);
       });
 
       document.getElementById('totalPrice').innerText = total;
@@ -137,11 +142,9 @@
     }
 
     function checkout() {
-      // 這裡可以將購物車資料傳到伺服器進行結帳處理
       alert("已完成結帳！");
     }
 
-    // 頁面載入時渲染購物車
     renderCart();
   </script>
 </body>
