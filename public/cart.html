@@ -13,8 +13,30 @@
       margin: 0;
     }
 
+    .top-left {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+    }
+
+    .top-left button {
+      background-color: #607d8b;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9em;
+      transition: background-color 0.3s;
+    }
+
+    .top-left button:hover {
+      background-color: #455a64;
+    }
+
     h1 {
       text-align: center;
+      margin-top: 20px;
       margin-bottom: 20px;
       color: #333;
     }
@@ -89,6 +111,10 @@
   </style>
 </head>
 <body>
+  <div class="top-left">
+    <button onclick="goBack()">返回</button>
+  </div>
+
   <h1>🛒 我的購物車</h1>
 
   <div id="cartContainer"></div>
@@ -98,7 +124,6 @@
   </div>
 
   <div class="center">
-    <button onclick="goBack()">返回</button>
     <button onclick="checkout()">結帳</button>
   </div>
 
@@ -151,7 +176,7 @@
     }
 
     function goBack() {
-      window.location.href = "bookForm.html"; // 請根據你的實際檔案名或路徑修改這行
+      window.location.href = "bookForm.html"; // 依實際檔案調整
     }
 
     renderCart();
