@@ -127,6 +127,19 @@
   </table>
 
   <script>
+    // 🔄 網址參數檢查，自動跳轉其他頁面
+    window.onload = function () {
+      const params = new URLSearchParams(window.location.search);
+      const page = params.get("page");
+
+      if (page) {
+        const target = `${page}.html`;
+        if (target !== "bookForm.html") {
+          window.location.href = target;
+        }
+      }
+    };
+
     // LIFF 初始化與登入
     async function initLIFF() {
       try {
