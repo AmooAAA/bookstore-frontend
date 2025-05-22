@@ -1,24 +1,21 @@
-const express = require('express'); 
+const express = require('express');  
 const router = express.Router(); 
 const Book = require('../models/Book');
+
 
 // 📌 1. 建立新書籍
 router.post('/books', async (req, res) => {
   try {
-    // 設定書籍資料
     const { title, author, price, condition, description, seller_id, image_url, is_sold } = req.body;
 
-    // 確保資料完整
     if (!title || !author || !price || !condition || !description || !seller_id) {
       return res.status(400).json({ error: '所有欄位都是必填的' });
     }
 
-    // 如果 image_url 存在，確認它是否是一個有效的 URL
     if (image_url && !/^https?:\/\/[^\s]+$/.test(image_url)) {
       return res.status(400).json({ error: '請提供有效的圖片網址' });
     }
 
-    // 創建新書籍實例
     const newBook = new Book({
       title,
       author,
@@ -26,46 +23,44 @@ router.post('/books', async (req, res) => {
       condition,
       description,
       seller_id,
-      image_url,  // 如果沒有提供圖片網址，這會是 undefined
-      is_sold: is_sold === "true" ? true : false,  // 確保布林值
-      created_at: new Date()  // 自動加入創建時間
+      image_url,
+      is_sold: is_sold === "true" ? true : false,
+      created_at: new Date()
     });
 
-    // 儲存新書籍
     await newBook.save();
-    res.status(201).json(newBook);  // 回傳新增的書籍資料
+    res.status(201).json(newBook);
   } catch (err) {
     res.status(500).json({ error: '無法創建書籍: ' + err.message });
   }
 });
 
-// 📌 2. 取得所有書籍（支持搜尋和過濾）
+
+// 📌 2. 取得所有書籍（支援搜尋 & 過濾）
 router.get('/books', async (req, res) => {
   try {
-    const { search, condition } = req.query;  // 從查詢參數獲取搜尋條件
+    const { search, condition } = req.query;
 
-    let query = {};  // 默認查詢條件
+    let query = {};
 
-    // 如果有搜尋條件，對書名和作者進行模糊搜尋
     if (search) {
       query.$or = [
-        { title: { $regex: search, $options: 'i' } },  // 書名模糊搜尋
-        { author: { $regex: search, $options: 'i' } },  // 作者模糊搜尋
+        { title: { $regex: search, $options: 'i' } },
+        { author: { $regex: search, $options: 'i' } }
       ];
     }
 
-    // 如果有書籍狀況過濾條件
     if (condition) {
       query.condition = condition;
     }
 
-    // 查詢書籍
     const books = await Book.find(query);
-    res.json(books);  // 返回過濾後的書籍資料
+    res.json(books);
   } catch (err) {
     res.status(500).json({ error: '無法取得書籍資料: ' + err.message });
   }
 });
+
 
 // 📌 3. 取得特定書籍
 router.get('/books/:id', async (req, res) => {
@@ -80,19 +75,46 @@ router.get('/books/:id', async (req, res) => {
   }
 });
 
-// 📌 4. 更新書籍資訊
+
+// 📌 4. 更新書籍資訊（PUT）
 router.put('/books/:id', async (req, res) => {
   try {
-    // 確保有傳入正確的 ID
-    const updatedBook = await Book.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const { title, author, price, condition, description, image_url, is_sold } = req.body;
+
+    // 驗證必填欄位（你可以自行決定是否強制）
+    if (!title || !author || !price || !condition || !description) {
+      return res.status(400).json({ error: '請填寫所有必要欄位' });
+    }
+
+    // 驗證圖片網址
+    if (image_url && !/^https?:\/\/[^\s]+$/.test(image_url)) {
+      return res.status(400).json({ error: '圖片網址格式錯誤' });
+    }
+
+    const updatedBook = await Book.findByIdAndUpdate(
+      req.params.id,
+      {
+        title,
+        author,
+        price,
+        condition,
+        description,
+        image_url,
+        is_sold: is_sold === "true" ? true : false
+      },
+      { new: true }
+    );
+
     if (!updatedBook) {
       return res.status(404).json({ error: '找不到要更新的書' });
     }
+
     res.json(updatedBook);
   } catch (err) {
     res.status(400).json({ error: '更新書籍錯誤: ' + err.message });
   }
 });
+
 
 // 📌 5. 刪除書籍
 router.delete('/books/:id', async (req, res) => {
@@ -106,5 +128,6 @@ router.delete('/books/:id', async (req, res) => {
     res.status(500).json({ error: '刪除書籍錯誤: ' + err.message });
   }
 });
+
 
 module.exports = router;

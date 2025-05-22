@@ -1,17 +1,14 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>二手書店</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 20px;
       max-width: 900px;
-    }
-    .form-group {
-      margin-bottom: 10px;
     }
     label {
       display: block;
@@ -28,16 +25,14 @@
       color: white;
       border: none;
       cursor: pointer;
+      margin-right: 5px;
     }
     button:hover {
       background-color: #45a049;
     }
-    .books-list {
-      margin-top: 30px;
-    }
     table {
-      border-collapse: collapse;
       width: 100%;
+      border-collapse: collapse;
       margin-top: 20px;
     }
     th, td {
@@ -54,39 +49,30 @@
   </style>
 </head>
 <body>
-
   <button onclick="window.location.href='bookForm.html'">⬅ 返回</button>
-
   <h1>二手書店</h1>
+  <h2>📚 新增 / 修改書籍</h2>
 
-  <h2>📚 新增書籍</h2>
   <form id="bookForm">
-    <label for="title">書名:</label>
-    <input type="text" id="title" name="title" required>
-
-    <label for="author">作者:</label>
-    <input type="text" id="author" name="author" required>
-
-    <label for="price">價格:</label>
-    <input type="number" id="price" name="price" required>
-
-    <label for="condition">書況:</label>
-    <input type="text" id="condition" name="condition" required>
-
-    <label for="description">說明:</label>
-    <textarea id="description" name="description" required></textarea>
-
-    <input type="hidden" id="seller_id" name="seller_id">
-
-    <label for="image_url">圖片網址:</label>
-    <input type="text" id="image_url" name="image_url" value="https://tinypic.host/images/2025/04/07/-2025-04-07-144124.jpg">
-
-    <label for="is_sold">是否已售出:</label>
-    <select id="is_sold" name="is_sold">
+    <input type="hidden" id="_id" />
+    <label>書名:</label>
+    <input type="text" id="title" required />
+    <label>作者:</label>
+    <input type="text" id="author" required />
+    <label>價格:</label>
+    <input type="number" id="price" required />
+    <label>書況:</label>
+    <input type="text" id="condition" required />
+    <label>說明:</label>
+    <textarea id="description" required></textarea>
+    <label>圖片網址:</label>
+    <input type="text" id="image_url" value="https://tinypic.host/images/2025/04/07/-2025-04-07-144124.jpg" />
+    <label>是否已售出:</label>
+    <select id="is_sold">
       <option value="false">否</option>
       <option value="true">是</option>
     </select>
-
+    <input type="hidden" id="seller_id" />
     <button type="submit">送出</button>
   </form>
 
@@ -120,7 +106,7 @@
     function getUserIdFromToken(token) {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
-        return payload.user_id || payload.id || ''; // 根據後端設計調整
+        return payload.user_id || payload.id || '';
       } catch (err) {
         console.error('Invalid token:', err);
         return '';
@@ -132,32 +118,40 @@
 
     document.getElementById('bookForm').addEventListener('submit', async function (e) {
       e.preventDefault();
-      const formData = new FormData(this);
-      const data = {};
-      formData.forEach((value, key) => {
-        if (key === "price") value = parseFloat(value);
-        if (key === "is_sold") value = value === "true";
-        data[key] = value;
-      });
+      const bookId = document.getElementById('_id').value;
+      const bookData = {
+        title: document.getElementById('title').value,
+        author: document.getElementById('author').value,
+        price: parseFloat(document.getElementById('price').value),
+        condition: document.getElementById('condition').value,
+        description: document.getElementById('description').value,
+        image_url: document.getElementById('image_url').value,
+        is_sold: document.getElementById('is_sold').value === "true",
+        seller_id: currentUserId,
+      };
+
+      const method = bookId ? 'PUT' : 'POST';
+      const url = bookId ? `${apiUrl}/${bookId}` : apiUrl;
 
       try {
-        const response = await fetch(apiUrl, {
-          method: 'POST',
+        const res = await fetch(url, {
+          method,
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+            'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify(data)
+          body: JSON.stringify(bookData)
         });
 
-        if (response.ok) {
-          alert('書籍新增成功！');
+        if (res.ok) {
+          alert(bookId ? '書籍更新成功！' : '書籍新增成功！');
           this.reset();
           document.getElementById('seller_id').value = currentUserId;
+          document.getElementById('_id').value = '';
           fetchBooks();
         } else {
-          const errorText = await response.text();
-          alert('新增書籍失敗：' + errorText);
+          const text = await res.text();
+          alert('操作失敗：' + text);
         }
       } catch (error) {
         alert('錯誤：' + error.message);
@@ -174,15 +168,9 @@
       const tbody = document.querySelector('#booksTable tbody');
       tbody.innerHTML = '';
 
-      // 篩選出只有當前用戶上架的書籍
       const userBooks = books.filter(book => book.seller_id === currentUserId);
-
       userBooks.forEach(book => {
         const row = document.createElement('tr');
-        let deleteBtn = '';
-        if (book.seller_id === currentUserId) {
-          deleteBtn = `<button onclick="deleteBook('${book._id}')">刪除</button>`;
-        }
         row.innerHTML = `
           <td>${book.title}</td>
           <td>${book.author}</td>
@@ -191,27 +179,47 @@
           <td>${book.description || ''}</td>
           <td>${book.is_sold ? '✔️' : '❌'}</td>
           <td><img src="${book.image_url}" alt="書籍圖片"></td>
-          <td>${deleteBtn}</td>
+          <td>
+            <button onclick="editBook('${book._id}')">編輯</button>
+            <button onclick="deleteBook('${book._id}')">刪除</button>
+          </td>
         `;
         tbody.appendChild(row);
       });
     }
 
-    async function deleteBook(bookId) {
-      const response = await fetch(`${apiUrl}/${bookId}`, {
+    async function deleteBook(id) {
+      if (!confirm('確定要刪除這本書嗎？')) return;
+      const res = await fetch(`${apiUrl}/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
-
-      if (response.ok) {
+      if (res.ok) {
         alert('書籍刪除成功');
         fetchBooks();
       } else {
-        const text = await response.text();
-        alert('刪除書籍失敗：' + text);
+        const text = await res.text();
+        alert('刪除失敗：' + text);
       }
+    }
+
+    async function editBook(id) {
+      const res = await fetch(`${apiUrl}/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const book = await res.json();
+      document.getElementById('_id').value = book._id;
+      document.getElementById('title').value = book.title;
+      document.getElementById('author').value = book.author;
+      document.getElementById('price').value = book.price;
+      document.getElementById('condition').value = book.condition;
+      document.getElementById('description').value = book.description;
+      document.getElementById('image_url').value = book.image_url;
+      document.getElementById('is_sold').value = book.is_sold ? "true" : "false";
     }
 
     fetchBooks();
