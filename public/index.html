@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
@@ -206,20 +206,32 @@
     }
 
     async function editBook(id) {
-      const res = await fetch(`${apiUrl}/${id}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
+      console.log('editBook called with id:', id);
+      try {
+        const res = await fetch(`${apiUrl}/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (!res.ok) {
+          alert('讀取書籍資料失敗');
+          return;
         }
-      });
-      const book = await res.json();
-      document.getElementById('_id').value = book._id;
-      document.getElementById('title').value = book.title;
-      document.getElementById('author').value = book.author;
-      document.getElementById('price').value = book.price;
-      document.getElementById('condition').value = book.condition;
-      document.getElementById('description').value = book.description;
-      document.getElementById('image_url').value = book.image_url;
-      document.getElementById('is_sold').value = book.is_sold ? "true" : "false";
+        const book = await res.json();
+        console.log('取得的書籍:', book);
+        document.getElementById('_id').value = book._id || '';
+        document.getElementById('title').value = book.title || '';
+        document.getElementById('author').value = book.author || '';
+        document.getElementById('price').value = book.price || '';
+        document.getElementById('condition').value = book.condition || '';
+        document.getElementById('description').value = book.description || '';
+        document.getElementById('image_url').value = book.image_url || '';
+        document.getElementById('is_sold').value = book.is_sold ? "true" : "false";
+        document.getElementById('seller_id').value = book.seller_id || '';
+      } catch (error) {
+        console.error('editBook error:', error);
+        alert('編輯失敗，請查看 Console');
+      }
     }
 
     fetchBooks();
