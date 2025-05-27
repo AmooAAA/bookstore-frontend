@@ -5,21 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>我的書籍</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
     body {
       font-family: Arial, sans-serif;
       margin: 0;
-      padding: 20px;
+      padding: 1rem;
       max-width: 100%;
       background-color: #f9f9f9;
     }
 
     h1, h2 {
-      margin-top: 1.2em;
-      color: #333;
+      font-size: 1.5rem;
+      margin: 1rem 0 0.5rem;
     }
 
     button {
@@ -27,48 +23,35 @@
       background-color: #4CAF50;
       color: white;
       border: none;
+      border-radius: 5px;
       cursor: pointer;
-      margin-top: 10px;
-      margin-right: 5px;
-      border-radius: 4px;
-      transition: background-color 0.3s ease;
+      font-size: 1rem;
+      margin-top: 0.5rem;
+      margin-bottom: 1rem;
     }
 
     button:hover {
       background-color: #45a049;
     }
 
-    form {
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
-      margin-top: 20px;
-    }
-
     label {
       display: block;
-      margin-top: 10px;
+      margin-top: 12px;
       font-weight: bold;
     }
 
     input, textarea, select {
       width: 100%;
-      padding: 8px;
+      padding: 10px;
       margin-top: 5px;
       border: 1px solid #ccc;
-      border-radius: 4px;
+      border-radius: 5px;
+      box-sizing: border-box;
+      font-size: 1rem;
     }
 
-    input[type="number"] {
-      -webkit-appearance: none;
-      appearance: none;
-    }
-
-    input[type="number"]::-webkit-outer-spin-button,
-    input[type="number"]::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
+    textarea {
+      resize: vertical;
     }
 
     #uploadArea {
@@ -79,19 +62,13 @@
       color: #666;
       cursor: pointer;
       border-radius: 6px;
-      user-select: none;
-      outline: none;
-      background: #fff;
+      background-color: white;
     }
 
     #uploadArea.dragover {
       background-color: #e8f5e9;
       border-color: #388e3c;
       color: #388e3c;
-    }
-
-    #uploadArea:focus {
-      box-shadow: 0 0 0 3px rgba(72, 180, 97, 0.5);
     }
 
     #status {
@@ -101,26 +78,19 @@
       min-height: 24px;
     }
 
-    .table-container {
-      overflow-x: auto;
-      margin-top: 20px;
-      background: #fff;
-      padding: 15px;
-      border-radius: 8px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.05);
-    }
-
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 700px;
+      margin-top: 1rem;
+      overflow-x: auto;
+      display: block;
     }
 
     th, td {
       border: 1px solid #ccc;
       padding: 8px;
       text-align: left;
-      vertical-align: middle;
+      font-size: 0.95rem;
     }
 
     th {
@@ -133,64 +103,77 @@
       object-fit: contain;
     }
 
+    /* 手機優化：將表格改為卡片樣式呈現 */
     @media (max-width: 768px) {
-      body {
-        padding: 10px;
+      table, thead, tbody, th, td, tr {
+        display: block;
       }
 
-      h1, h2 {
-        font-size: 1.3rem;
+      thead {
+        display: none;
       }
 
-      label {
-        margin-top: 8px;
+      tr {
+        margin-bottom: 1rem;
+        background: white;
+        padding: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
       }
 
-      button {
-        width: 100%;
-        margin-bottom: 10px;
+      td {
+        position: relative;
+        padding-left: 50%;
+        border: none;
+        border-bottom: 1px solid #eee;
       }
 
-      table {
-        font-size: 0.9rem;
+      td::before {
+        position: absolute;
+        left: 10px;
+        top: 8px;
+        width: 45%;
+        white-space: nowrap;
+        font-weight: bold;
+        color: #555;
       }
 
-      img {
-        max-width: 60px;
-        max-height: 60px;
-      }
+      td:nth-of-type(1)::before { content: "書名"; }
+      td:nth-of-type(2)::before { content: "作者"; }
+      td:nth-of-type(3)::before { content: "價格"; }
+      td:nth-of-type(4)::before { content: "書況"; }
+      td:nth-of-type(5)::before { content: "說明"; }
+      td:nth-of-type(6)::before { content: "已售出"; }
+      td:nth-of-type(7)::before { content: "圖片"; }
+      td:nth-of-type(8)::before { content: "操作"; }
     }
   </style>
 </head>
 <body>
-  <!-- 內容區 -->
   <button onclick="window.location.href='bookForm.html'">⬅ 返回</button>
-  <h1>我的書籍</h1>
-  <h2>新增 / 修改書籍</h2>
+  <h1>新增 / 修改書籍</h1>
 
-  <!-- 拖拉上傳 -->
   <div id="uploadArea" tabindex="0" role="button" aria-label="點擊或拖拉圖片上傳">
     AI辨識 - 點擊選擇圖片上傳
   </div>
   <input type="file" id="fileInput" accept="image/*" style="display:none" />
   <div id="status"></div>
 
-  <!-- 書籍表單 -->
   <form id="bookForm">
     <input type="hidden" id="_id" />
-    <label for="title">書名:</label>
+    <label for="title">書名</label>
     <input type="text" id="title" required autocomplete="off" />
-    <label for="author">作者:</label>
+    <label for="author">作者</label>
     <input type="text" id="author" required autocomplete="off" />
-    <label for="price">價格:</label>
+    <label for="price">價格</label>
     <input type="number" id="price" required min="0" step="0.01" />
-    <label for="condition">書況:</label>
+    <label for="condition">書況</label>
     <input type="text" id="condition" required autocomplete="off" />
-    <label for="description">說明:</label>
+    <label for="description">說明</label>
     <textarea id="description" required></textarea>
-    <label for="image_url">圖片網址:</label>
+    <label for="image_url">圖片網址</label>
     <input type="text" id="image_url" value="https://tinypic.host/images/2025/04/07/-2025-04-07-144124.jpg" autocomplete="off" />
-    <label for="is_sold">是否已售出:</label>
+    <label for="is_sold">是否已售出</label>
     <select id="is_sold">
       <option value="false">否</option>
       <option value="true">是</option>
@@ -199,26 +182,23 @@
     <button type="submit">送出</button>
   </form>
 
-  <!-- 書籍列表 -->
   <h2>我的書籍清單</h2>
   <button onclick="fetchBooks()">🔄 重新載入</button>
-  <div class="table-container">
-    <table id="booksTable" aria-live="polite" aria-relevant="all">
-      <thead>
-        <tr>
-          <th>書名</th>
-          <th>作者</th>
-          <th>價格</th>
-          <th>書況</th>
-          <th>說明</th>
-          <th>已售出</th>
-          <th>圖片</th>
-          <th>操作</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
+  <table id="booksTable" aria-live="polite" aria-relevant="all">
+    <thead>
+      <tr>
+        <th>書名</th>
+        <th>作者</th>
+        <th>價格</th>
+        <th>書況</th>
+        <th>說明</th>
+        <th>已售出</th>
+        <th>圖片</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 <script>
   const apiUrl = 'https://cccbookbot-0c3d990eba99.herokuapp.com/api/books';
   const token = localStorage.getItem('token');
