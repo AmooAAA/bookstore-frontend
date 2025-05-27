@@ -18,6 +18,16 @@
       width: 100%;
       padding: 8px;
       margin-top: 5px;
+      box-sizing: border-box;
+    }
+    input[type="number"] {
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
     }
     button {
       padding: 10px 15px;
@@ -26,6 +36,8 @@
       border: none;
       cursor: pointer;
       margin-right: 5px;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
     }
     button:hover {
       background-color: #45a049;
@@ -39,12 +51,15 @@
       border: 1px solid #ccc;
       padding: 8px;
       text-align: left;
+      vertical-align: middle;
     }
     th {
       background-color: #f0f0f0;
     }
     img {
       max-width: 100px;
+      max-height: 80px;
+      object-fit: contain;
     }
     /* 拖拉區塊樣式 */
     #uploadArea {
@@ -54,16 +69,23 @@
       text-align: center;
       color: #666;
       cursor: pointer;
+      border-radius: 6px;
+      user-select: none;
+      outline: none;
     }
     #uploadArea.dragover {
       background-color: #e8f5e9;
       border-color: #388e3c;
       color: #388e3c;
     }
+    #uploadArea:focus {
+      box-shadow: 0 0 0 3px rgba(72, 180, 97, 0.5);
+    }
     #status {
       margin-top: 10px;
       font-weight: bold;
       color: #f57c00;
+      min-height: 24px;
     }
   </style>
 </head>
@@ -73,7 +95,7 @@
   <h2>📚 新增 / 修改書籍</h2>
 
   <!-- 新增拖拉上傳區塊 -->
-  <div id="uploadArea" tabindex="0">
+  <div id="uploadArea" tabindex="0" role="button" aria-label="點擊或拖拉圖片上傳">
     拖拉圖片或點擊這裡選擇圖片上傳並辨識
   </div>
   <input type="file" id="fileInput" accept="image/*" style="display:none" />
@@ -82,19 +104,19 @@
 
   <form id="bookForm">
     <input type="hidden" id="_id" />
-    <label>書名:</label>
-    <input type="text" id="title" required />
-    <label>作者:</label>
-    <input type="text" id="author" required />
-    <label>價格:</label>
-    <input type="number" id="price" required />
-    <label>書況:</label>
-    <input type="text" id="condition" required />
-    <label>說明:</label>
+    <label for="title">書名:</label>
+    <input type="text" id="title" required autocomplete="off" />
+    <label for="author">作者:</label>
+    <input type="text" id="author" required autocomplete="off" />
+    <label for="price">價格:</label>
+    <input type="number" id="price" required min="0" step="0.01" />
+    <label for="condition">書況:</label>
+    <input type="text" id="condition" required autocomplete="off" />
+    <label for="description">說明:</label>
     <textarea id="description" required></textarea>
-    <label>圖片網址:</label>
-    <input type="text" id="image_url" value="https://tinypic.host/images/2025/04/07/-2025-04-07-144124.jpg" />
-    <label>是否已售出:</label>
+    <label for="image_url">圖片網址:</label>
+    <input type="text" id="image_url" value="https://tinypic.host/images/2025/04/07/-2025-04-07-144124.jpg" autocomplete="off" />
+    <label for="is_sold">是否已售出:</label>
     <select id="is_sold">
       <option value="false">否</option>
       <option value="true">是</option>
@@ -105,7 +127,7 @@
 
   <h2>📖 書籍清單</h2>
   <button onclick="fetchBooks()">🔄 重新載入</button>
-  <table id="booksTable">
+  <table id="booksTable" aria-live="polite" aria-relevant="all">
     <thead>
       <tr>
         <th>書名</th>
@@ -145,17 +167,22 @@
 
   document.getElementById('bookForm').addEventListener('submit', async function (e) {
     e.preventDefault();
-    const bookId = document.getElementById('_id').value;
+    const bookId = document.getElementById('_id').value.trim();
     const bookData = {
-      title: document.getElementById('title').value,
-      author: document.getElementById('author').value,
+      title: document.getElementById('title').value.trim(),
+      author: document.getElementById('author').value.trim(),
       price: parseFloat(document.getElementById('price').value),
-      condition: document.getElementById('condition').value,
-      description: document.getElementById('description').value,
-      image_url: document.getElementById('image_url').value,
+      condition: document.getElementById('condition').value.trim(),
+      description: document.getElementById('description').value.trim(),
+      image_url: document.getElementById('image_url').value.trim(),
       is_sold: document.getElementById('is_sold').value === "true",
       seller_id: currentUserId,
     };
+
+    if (isNaN(bookData.price) || bookData.price < 0) {
+      alert('請輸入正確的價格');
+      return;
+    }
 
     const method = bookId ? 'PUT' : 'POST';
     const url = bookId ? `${apiUrl}/${bookId}` : apiUrl;
@@ -186,49 +213,60 @@
   });
 
   async function fetchBooks() {
-    const response = await fetch(apiUrl, {
-      headers: {
-        'Authorization': `Bearer ${token}`
+    try {
+      const response = await fetch(apiUrl, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!response.ok) {
+        alert('取得書籍資料失敗');
+        return;
       }
-    });
-    const books = await response.json();
-    const tbody = document.querySelector('#booksTable tbody');
-    tbody.innerHTML = '';
+      const books = await response.json();
+      const tbody = document.querySelector('#booksTable tbody');
+      tbody.innerHTML = '';
 
-    const userBooks = books.filter(book => book.seller_id === currentUserId);
-    userBooks.forEach(book => {
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td>${book.title}</td>
-        <td>${book.author}</td>
-        <td>$${book.price}</td>
-        <td>${book.condition}</td>
-        <td>${book.description || ''}</td>
-        <td>${book.is_sold ? '✔️' : '❌'}</td>
-        <td><img src="${book.image_url}" alt="書籍圖片"></td>
-        <td>
-          <button onclick="editBook('${book._id}')">編輯</button>
-          <button onclick="deleteBook('${book._id}')">刪除</button>
-        </td>
-      `;
-      tbody.appendChild(row);
-    });
+      const userBooks = books.filter(book => book.seller_id === currentUserId);
+      userBooks.forEach(book => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${escapeHtml(book.title)}</td>
+          <td>${escapeHtml(book.author)}</td>
+          <td>$${book.price.toFixed(2)}</td>
+          <td>${escapeHtml(book.condition)}</td>
+          <td>${escapeHtml(book.description || '')}</td>
+          <td>${book.is_sold ? '✔️' : '❌'}</td>
+          <td><img src="${escapeHtml(book.image_url)}" alt="書籍圖片"></td>
+          <td>
+            <button type="button" onclick="editBook('${book._id}')">編輯</button>
+            <button type="button" onclick="deleteBook('${book._id}')">刪除</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    } catch (error) {
+      alert('讀取書籍列表錯誤：' + error.message);
+    }
   }
 
   async function deleteBook(id) {
     if (!confirm('確定要刪除這本書嗎？')) return;
-    const res = await fetch(`${apiUrl}/${id}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`
+    try {
+      const res = await fetch(`${apiUrl}/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (res.ok) {
+        alert('刪除成功');
+        fetchBooks();
+      } else {
+        alert('刪除失敗');
       }
-    });
-    if (res.ok) {
-      alert('書籍刪除成功');
-      fetchBooks();
-    } else {
-      const text = await res.text();
-      alert('刪除失敗：' + text);
+    } catch (error) {
+      alert('刪除失敗：' + error.message);
     }
   }
 
@@ -240,54 +278,67 @@
         }
       });
       if (!res.ok) {
-        alert('讀取書籍資料失敗');
+        alert('取得書籍資料失敗');
         return;
       }
       const book = await res.json();
-      document.getElementById('_id').value = book._id || '';
+      document.getElementById('_id').value = book._id;
       document.getElementById('title').value = book.title || '';
       document.getElementById('author').value = book.author || '';
-      document.getElementById('price').value = book.price || '';
+      document.getElementById('price').value = book.price || 0;
       document.getElementById('condition').value = book.condition || '';
       document.getElementById('description').value = book.description || '';
       document.getElementById('image_url').value = book.image_url || '';
       document.getElementById('is_sold').value = book.is_sold ? "true" : "false";
-      document.getElementById('seller_id').value = book.seller_id || '';
+      document.getElementById('seller_id').value = book.seller_id || currentUserId;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error) {
-      console.error('editBook error:', error);
-      alert('編輯失敗，請查看 Console');
+      alert('載入書籍資料錯誤：' + error.message);
     }
   }
 
-  // ----- 新增的拖拉上傳 & 辨識功能 -----
+  // 防 XSS 基本函式
+  function escapeHtml(text) {
+    return text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  // 拖拉區塊功能
   const uploadArea = document.getElementById('uploadArea');
   const fileInput = document.getElementById('fileInput');
   const status = document.getElementById('status');
 
-  // 點擊區塊觸發檔案選擇
   uploadArea.addEventListener('click', () => fileInput.click());
 
-  // 拖拉時樣式改變
+  uploadArea.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      fileInput.click();
+    }
+  });
+
   uploadArea.addEventListener('dragover', (e) => {
     e.preventDefault();
     uploadArea.classList.add('dragover');
   });
+
   uploadArea.addEventListener('dragleave', (e) => {
     e.preventDefault();
     uploadArea.classList.remove('dragover');
   });
 
-  // 放開拖拉檔案
   uploadArea.addEventListener('drop', (e) => {
     e.preventDefault();
     uploadArea.classList.remove('dragover');
-    const files = e.dataTransfer.files;
-    if (files.length > 0) {
-      handleFile(files[0]);
+    if (e.dataTransfer.files.length > 0) {
+      handleFile(e.dataTransfer.files[0]);
     }
   });
 
-  // 檔案選擇後觸發
   fileInput.addEventListener('change', () => {
     if (fileInput.files.length > 0) {
       handleFile(fileInput.files[0]);
@@ -295,42 +346,36 @@
   });
 
   function handleFile(file) {
-    // 只接受圖片
     if (!file.type.startsWith('image/')) {
-      alert('請上傳圖片檔案');
+      status.textContent = '請上傳圖片檔案';
       return;
     }
-    status.textContent = '辨識中... 請稍候';
+    status.textContent = '圖片辨識中...（模擬）';
 
-    // 模擬辨識過程 (3秒後帶入假資料)
+    // 模擬辨識，3秒後完成
     setTimeout(() => {
-      status.textContent = '辨識完成！已自動填入假資料';
+      // 模擬識別結果
+      const fakeTitle = '模擬書名';
+      const fakeAuthor = '模擬作者';
+      const fakePrice = 150;
+      const fakeCondition = '良好';
+      const fakeDescription = '這是模擬的辨識結果，請手動調整。';
 
-      // 模擬假資料，自行修改想要的預設內容
-      const fakeData = {
-        title: "哈利波特與魔法石",
-        author: "J.K. Rowling",
-        price: 350,
-        condition: "九成新",
-        description: "一本經典奇幻小說，非常適合收藏。",
-        image_url: URL.createObjectURL(file), // 直接用上傳圖片的暫存URL
-        is_sold: false
-      };
+      // 產生本地圖片URL顯示
+      const imgUrl = URL.createObjectURL(file);
 
-      document.getElementById('title').value = fakeData.title;
-      document.getElementById('author').value = fakeData.author;
-      document.getElementById('price').value = fakeData.price;
-      document.getElementById('condition').value = fakeData.condition;
-      document.getElementById('description').value = fakeData.description;
-      document.getElementById('image_url').value = fakeData.image_url;
-      document.getElementById('is_sold').value = fakeData.is_sold ? "true" : "false";
+      document.getElementById('title').value = fakeTitle;
+      document.getElementById('author').value = fakeAuthor;
+      document.getElementById('price').value = fakePrice;
+      document.getElementById('condition').value = fakeCondition;
+      document.getElementById('description').value = fakeDescription;
+      document.getElementById('image_url').value = imgUrl;
 
-      // 清除 fileInput 以便可再次選擇同一張圖片
-      fileInput.value = '';
+      status.textContent = '圖片辨識完成，請確認資料後送出。';
     }, 3000);
   }
 
-  // 初始化載入書籍列表
+  // 頁面載入時自動抓取書籍
   fetchBooks();
 </script>
 </body>
