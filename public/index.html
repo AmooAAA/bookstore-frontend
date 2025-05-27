@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
@@ -7,150 +7,105 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 20px auto;
+      margin: 20px;
       max-width: 900px;
-      background: #fafafa;
-      color: #333;
     }
     label {
       display: block;
-      margin-top: 12px;
-      font-weight: bold;
+      margin-top: 10px;
     }
     input, textarea, select {
       width: 100%;
       padding: 8px;
       margin-top: 5px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      box-sizing: border-box;
-      font-size: 1em;
-      resize: vertical;
     }
     button {
-      padding: 10px 18px;
+      padding: 10px 15px;
       background-color: #4CAF50;
       color: white;
       border: none;
-      border-radius: 4px;
       cursor: pointer;
-      margin-top: 15px;
-      margin-right: 8px;
-      font-size: 1em;
-      transition: background-color 0.3s ease;
+      margin-right: 5px;
     }
-    button:hover:not(:disabled) {
+    button:hover {
       background-color: #45a049;
-    }
-    button:disabled {
-      background-color: #999;
-      cursor: not-allowed;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 25px;
-      background: white;
-      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      margin-top: 20px;
     }
     th, td {
-      border: 1px solid #ddd;
-      padding: 10px 8px;
+      border: 1px solid #ccc;
+      padding: 8px;
       text-align: left;
-      vertical-align: middle;
-      font-size: 0.95em;
     }
     th {
       background-color: #f0f0f0;
     }
     img {
       max-width: 100px;
-      max-height: 80px;
-      object-fit: contain;
-      border: 1px solid #ccc;
-      border-radius: 3px;
     }
-    .btn-small {
-      padding: 6px 12px;
-      font-size: 0.9em;
-      border-radius: 3px;
+    /* 拖拉區塊樣式 */
+    #uploadArea {
+      margin-top: 20px;
+      padding: 20px;
+      border: 2px dashed #4CAF50;
+      text-align: center;
+      color: #666;
+      cursor: pointer;
     }
-    .btn-edit {
-      background-color: #2196F3;
+    #uploadArea.dragover {
+      background-color: #e8f5e9;
+      border-color: #388e3c;
+      color: #388e3c;
     }
-    .btn-edit:hover {
-      background-color: #1976d2;
-    }
-    .btn-delete {
-      background-color: #f44336;
-    }
-    .btn-delete:hover {
-      background-color: #d32f2f;
-    }
-    @media (max-width: 600px) {
-      body {
-        margin: 10px;
-      }
-      img {
-        max-width: 60px;
-        max-height: 50px;
-      }
-      th, td {
-        font-size: 0.85em;
-        padding: 6px 5px;
-      }
-      button {
-        padding: 8px 14px;
-        font-size: 0.9em;
-      }
+    #status {
+      margin-top: 10px;
+      font-weight: bold;
+      color: #f57c00;
     }
   </style>
 </head>
 <body>
-  <button type="button" onclick="window.location.href='bookForm.html'">⬅ 返回</button>
+  <button onclick="window.location.href='bookForm.html'">⬅ 返回</button>
   <h1>二手書店</h1>
   <h2>📚 新增 / 修改書籍</h2>
 
+  <!-- 新增拖拉上傳區塊 -->
+  <div id="uploadArea" tabindex="0">
+    拖拉圖片或點擊這裡選擇圖片上傳並辨識
+  </div>
+  <input type="file" id="fileInput" accept="image/*" style="display:none" />
+
+  <div id="status"></div>
+
   <form id="bookForm">
     <input type="hidden" id="_id" />
-    <label for="title">書名:</label>
-    <input type="text" id="title" placeholder="請輸入書名" required />
-    
-    <label for="author">作者:</label>
-    <input type="text" id="author" placeholder="請輸入作者名稱" required />
-    
-    <label for="price">價格 (新台幣):</label>
-    <input type="number" id="price" placeholder="請輸入價格" min="0" step="0.01" required />
-    
-    <label for="condition">書況:</label>
-    <select id="condition" required>
-      <option value="" disabled selected>請選擇書況</option>
-      <option value="全新">全新</option>
-      <option value="九成新">九成新</option>
-      <option value="八成新">八成新</option>
-      <option value="七成新">七成新</option>
-      <option value="五成新以下">五成新以下</option>
-    </select>
-    
-    <label for="description">說明:</label>
-    <textarea id="description" placeholder="請輸入書籍說明" rows="4" required></textarea>
-    
-    <label for="image_url">圖片網址:</label>
-    <input type="url" id="image_url" placeholder="請輸入圖片連結" value="https://tinypic.host/images/2025/04/07/-2025-04-07-144124.jpg" />
-    
-    <label for="is_sold">是否已售出:</label>
+    <label>書名:</label>
+    <input type="text" id="title" required />
+    <label>作者:</label>
+    <input type="text" id="author" required />
+    <label>價格:</label>
+    <input type="number" id="price" required />
+    <label>書況:</label>
+    <input type="text" id="condition" required />
+    <label>說明:</label>
+    <textarea id="description" required></textarea>
+    <label>圖片網址:</label>
+    <input type="text" id="image_url" value="https://tinypic.host/images/2025/04/07/-2025-04-07-144124.jpg" />
+    <label>是否已售出:</label>
     <select id="is_sold">
       <option value="false">否</option>
       <option value="true">是</option>
     </select>
-
     <input type="hidden" id="seller_id" />
-    <button type="submit" id="submitBtn">送出</button>
+    <button type="submit">送出</button>
   </form>
 
   <h2>📖 書籍清單</h2>
-  <button type="button" onclick="fetchBooks()">🔄 重新載入</button>
-  <table id="booksTable" aria-label="書籍清單表格">
+  <button onclick="fetchBooks()">🔄 重新載入</button>
+  <table id="booksTable">
     <thead>
       <tr>
         <th>書名</th>
@@ -166,185 +121,217 @@
     <tbody></tbody>
   </table>
 
-  <script>
-    const apiUrl = 'https://cccbookbot-0c3d990eba99.herokuapp.com/api/books';
-    const token = localStorage.getItem('token');
-    let currentUserId = '';
+<script>
+  const apiUrl = 'https://cccbookbot-0c3d990eba99.herokuapp.com/api/books';
+  const token = localStorage.getItem('token');
+  let currentUserId = '';
 
-    if (!token) {
-      alert('尚未登入，請先登入');
-      window.location.href = 'login.html';
+  if (!token) {
+    window.location.href = 'login.html';
+  }
+
+  function getUserIdFromToken(token) {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.user_id || payload.id || '';
+    } catch (err) {
+      console.error('Invalid token:', err);
+      return '';
     }
+  }
 
-    function getUserIdFromToken(token) {
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        return payload.user_id || payload.id || '';
-      } catch (err) {
-        console.error('Invalid token:', err);
-        return '';
+  currentUserId = getUserIdFromToken(token);
+  document.getElementById('seller_id').value = currentUserId;
+
+  document.getElementById('bookForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const bookId = document.getElementById('_id').value;
+    const bookData = {
+      title: document.getElementById('title').value,
+      author: document.getElementById('author').value,
+      price: parseFloat(document.getElementById('price').value),
+      condition: document.getElementById('condition').value,
+      description: document.getElementById('description').value,
+      image_url: document.getElementById('image_url').value,
+      is_sold: document.getElementById('is_sold').value === "true",
+      seller_id: currentUserId,
+    };
+
+    const method = bookId ? 'PUT' : 'POST';
+    const url = bookId ? `${apiUrl}/${bookId}` : apiUrl;
+
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(bookData)
+      });
+
+      if (res.ok) {
+        alert(bookId ? '書籍更新成功！' : '書籍新增成功！');
+        this.reset();
+        document.getElementById('seller_id').value = currentUserId;
+        document.getElementById('_id').value = '';
+        fetchBooks();
+      } else {
+        const text = await res.text();
+        alert('操作失敗：' + text);
       }
+    } catch (error) {
+      alert('錯誤：' + error.message);
     }
+  });
 
-    currentUserId = getUserIdFromToken(token);
-    document.getElementById('seller_id').value = currentUserId;
-
-    const form = document.getElementById('bookForm');
-    const submitBtn = document.getElementById('submitBtn');
-
-    form.addEventListener('submit', async function (e) {
-      e.preventDefault();
-
-      submitBtn.disabled = true;
-      submitBtn.textContent = '送出中...';
-
-      const bookId = document.getElementById('_id').value;
-      const bookData = {
-        title: document.getElementById('title').value.trim(),
-        author: document.getElementById('author').value.trim(),
-        price: parseFloat(document.getElementById('price').value),
-        condition: document.getElementById('condition').value,
-        description: document.getElementById('description').value.trim(),
-        image_url: document.getElementById('image_url').value.trim() || 'https://via.placeholder.com/100x80?text=No+Image',
-        is_sold: document.getElementById('is_sold').value === "true",
-        seller_id: currentUserId,
-      };
-
-      const method = bookId ? 'PUT' : 'POST';
-      const url = bookId ? `${apiUrl}/${bookId}` : apiUrl;
-
-      try {
-        const res = await fetch(url, {
-          method,
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify(bookData)
-        });
-
-        if (res.ok) {
-          alert(bookId ? '書籍更新成功！' : '書籍新增成功！');
-          form.reset();
-          document.getElementById('seller_id').value = currentUserId;
-          document.getElementById('_id').value = '';
-          fetchBooks();
-        } else {
-          const text = await res.text();
-          alert('操作失敗：' + text);
-        }
-      } catch (error) {
-        alert('錯誤：' + error.message);
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = '送出';
+  async function fetchBooks() {
+    const response = await fetch(apiUrl, {
+      headers: {
+        'Authorization': `Bearer ${token}`
       }
     });
+    const books = await response.json();
+    const tbody = document.querySelector('#booksTable tbody');
+    tbody.innerHTML = '';
 
-    async function fetchBooks() {
-      try {
-        const response = await fetch(apiUrl, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        if (!response.ok) throw new Error('取得書籍資料失敗');
-        const books = await response.json();
-        const tbody = document.querySelector('#booksTable tbody');
-        tbody.innerHTML = '';
+    const userBooks = books.filter(book => book.seller_id === currentUserId);
+    userBooks.forEach(book => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${book.title}</td>
+        <td>${book.author}</td>
+        <td>$${book.price}</td>
+        <td>${book.condition}</td>
+        <td>${book.description || ''}</td>
+        <td>${book.is_sold ? '✔️' : '❌'}</td>
+        <td><img src="${book.image_url}" alt="書籍圖片"></td>
+        <td>
+          <button onclick="editBook('${book._id}')">編輯</button>
+          <button onclick="deleteBook('${book._id}')">刪除</button>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
 
-        const userBooks = books.filter(book => book.seller_id === currentUserId);
-        if (userBooks.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#888;">目前沒有您的書籍資料</td></tr>`;
-          return;
-        }
-
-        userBooks.forEach(book => {
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${escapeHtml(book.title)}</td>
-            <td>${escapeHtml(book.author)}</td>
-            <td>$${book.price.toFixed(2)}</td>
-            <td>${escapeHtml(book.condition)}</td>
-            <td title="${escapeHtml(book.description)}">${escapeHtml(book.description || '').substring(0, 20)}${book.description && book.description.length > 20 ? '...' : ''}</td>
-            <td style="text-align:center;">${book.is_sold ? '✔️' : '❌'}</td>
-            <td><img src="${escapeHtml(book.image_url)}" alt="書籍圖片" onerror="this.src='https://via.placeholder.com/100x80?text=No+Image'" /></td>
-            <td>
-              <button type="button" class="btn-small btn-edit" onclick="editBook('${book._id}')">編輯</button>
-              <button type="button" class="btn-small btn-delete" onclick="deleteBook('${book._id}')">刪除</button>
-            </td>
-          `;
-          tbody.appendChild(row);
-        });
-      } catch (error) {
-        alert('載入書籍資料失敗：' + error.message);
+  async function deleteBook(id) {
+    if (!confirm('確定要刪除這本書嗎？')) return;
+    const res = await fetch(`${apiUrl}/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
       }
+    });
+    if (res.ok) {
+      alert('書籍刪除成功');
+      fetchBooks();
+    } else {
+      const text = await res.text();
+      alert('刪除失敗：' + text);
     }
+  }
 
-    async function deleteBook(id) {
-      if (!confirm('確定要刪除這本書嗎？')) return;
-      try {
-        const res = await fetch(`${apiUrl}/${id}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        if (res.ok) {
-          alert('書籍刪除成功');
-          fetchBooks();
-        } else {
-          const text = await res.text();
-          alert('刪除失敗：' + text);
+  async function editBook(id) {
+    try {
+      const res = await fetch(`${apiUrl}/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
         }
-      } catch (error) {
-        alert('刪除失敗：' + error.message);
-      }
-    }
-
-    async function editBook(id) {
-      try {
-        const res = await fetch(`${apiUrl}/${id}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        if (!res.ok) {
-          alert('讀取書籍資料失敗');
-          return;
-        }
-        const book = await res.json();
-        document.getElementById('_id').value = book._id || '';
-        document.getElementById('title').value = book.title || '';
-        document.getElementById('author').value = book.author || '';
-        document.getElementById('price').value = book.price || '';
-        document.getElementById('condition').value = book.condition || '';
-        document.getElementById('description').value = book.description || '';
-        document.getElementById('image_url').value = book.image_url || '';
-        document.getElementById('is_sold').value = book.is_sold ? "true" : "false";
-        document.getElementById('seller_id').value = book.seller_id || '';
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } catch (error) {
-        alert('編輯失敗，請查看 Console');
-        console.error('editBook error:', error);
-      }
-    }
-
-    // 簡單防XSS函式，避免顯示時有問題
-    function escapeHtml(text) {
-      if (!text) return '';
-      return text.replace(/[&<>"']/g, function(m) {
-        return {
-          '&': '&amp;',
-          '<': '&lt;',
-          '>': '&gt;',
-          '"': '&quot;',
-          "'": '&#39;'
-        }[m];
       });
+      if (!res.ok) {
+        alert('讀取書籍資料失敗');
+        return;
+      }
+      const book = await res.json();
+      document.getElementById('_id').value = book._id || '';
+      document.getElementById('title').value = book.title || '';
+      document.getElementById('author').value = book.author || '';
+      document.getElementById('price').value = book.price || '';
+      document.getElementById('condition').value = book.condition || '';
+      document.getElementById('description').value = book.description || '';
+      document.getElementById('image_url').value = book.image_url || '';
+      document.getElementById('is_sold').value = book.is_sold ? "true" : "false";
+      document.getElementById('seller_id').value = book.seller_id || '';
+    } catch (error) {
+      console.error('editBook error:', error);
+      alert('編輯失敗，請查看 Console');
     }
+  }
 
-    fetchBooks();
-  </script>
+  // ----- 新增的拖拉上傳 & 辨識功能 -----
+  const uploadArea = document.getElementById('uploadArea');
+  const fileInput = document.getElementById('fileInput');
+  const status = document.getElementById('status');
+
+  // 點擊區塊觸發檔案選擇
+  uploadArea.addEventListener('click', () => fileInput.click());
+
+  // 拖拉時樣式改變
+  uploadArea.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    uploadArea.classList.add('dragover');
+  });
+  uploadArea.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    uploadArea.classList.remove('dragover');
+  });
+
+  // 放開拖拉檔案
+  uploadArea.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadArea.classList.remove('dragover');
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      handleFile(files[0]);
+    }
+  });
+
+  // 檔案選擇後觸發
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files.length > 0) {
+      handleFile(fileInput.files[0]);
+    }
+  });
+
+  function handleFile(file) {
+    // 只接受圖片
+    if (!file.type.startsWith('image/')) {
+      alert('請上傳圖片檔案');
+      return;
+    }
+    status.textContent = '辨識中... 請稍候';
+
+    // 模擬辨識過程 (3秒後帶入假資料)
+    setTimeout(() => {
+      status.textContent = '辨識完成！已自動填入假資料';
+
+      // 模擬假資料，自行修改想要的預設內容
+      const fakeData = {
+        title: "哈利波特與魔法石",
+        author: "J.K. Rowling",
+        price: 350,
+        condition: "九成新",
+        description: "一本經典奇幻小說，非常適合收藏。",
+        image_url: URL.createObjectURL(file), // 直接用上傳圖片的暫存URL
+        is_sold: false
+      };
+
+      document.getElementById('title').value = fakeData.title;
+      document.getElementById('author').value = fakeData.author;
+      document.getElementById('price').value = fakeData.price;
+      document.getElementById('condition').value = fakeData.condition;
+      document.getElementById('description').value = fakeData.description;
+      document.getElementById('image_url').value = fakeData.image_url;
+      document.getElementById('is_sold').value = fakeData.is_sold ? "true" : "false";
+
+      // 清除 fileInput 以便可再次選擇同一張圖片
+      fileInput.value = '';
+    }, 3000);
+  }
+
+  // 初始化載入書籍列表
+  fetchBooks();
+</script>
 </body>
 </html>
