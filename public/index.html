@@ -87,14 +87,6 @@
       color: #f57c00;
       min-height: 24px;
     }
-    #previewImage {
-      margin-top: 10px;
-      max-width: 200px;
-      max-height: 150px;
-      object-fit: contain;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
   </style>
 </head>
 <body>
@@ -107,8 +99,8 @@
     拖拉圖片或點擊這裡選擇圖片上傳並辨識
   </div>
   <input type="file" id="fileInput" accept="image/*" style="display:none" />
+
   <div id="status"></div>
-  <img id="previewImage" src="" alt="預覽圖片" style="display:none" />
 
   <form id="bookForm">
     <input type="hidden" id="_id" />
@@ -210,7 +202,6 @@
         this.reset();
         document.getElementById('seller_id').value = currentUserId;
         document.getElementById('_id').value = '';
-        document.getElementById('previewImage').style.display = 'none';
         fetchBooks();
       } else {
         const text = await res.text();
@@ -244,48 +235,19 @@
           <td>${escapeHtml(book.author)}</td>
           <td>$${book.price.toFixed(2)}</td>
           <td>${escapeHtml(book.condition)}</td>
-          <td>${escapeHtml(book.description)}</td>
-          <td>${book.is_sold ? '是' : '否'}</td>
-          <td><img src="${escapeHtml(book.image_url)}" alt="書籍圖片" /></td>
+          <td>${escapeHtml(book.description || '')}</td>
+          <td>${book.is_sold ? '✔️' : '❌'}</td>
+          <td><img src="${escapeHtml(book.image_url)}" alt="書籍圖片"></td>
           <td>
-            <button onclick="editBook('${book._id}')">編輯</button>
-            <button onclick="deleteBook('${book._id}')">刪除</button>
-          </td>`;
+            <button type="button" onclick="editBook('${book._id}')">編輯</button>
+            <button type="button" onclick="deleteBook('${book._id}')">刪除</button>
+          </td>
+        `;
         tbody.appendChild(row);
       });
     } catch (error) {
-      alert('錯誤：' + error.message);
+      alert('讀取書籍列表錯誤：' + error.message);
     }
-  }
-
-  function editBook(id) {
-    fetch(`${apiUrl}/${id}`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
-      .then(res => {
-        if (!res.ok) throw new Error('讀取書籍失敗');
-        return res.json();
-      })
-      .then(book => {
-        document.getElementById('_id').value = book._id;
-        document.getElementById('title').value = book.title;
-        document.getElementById('author').value = book.author;
-        document.getElementById('price').value = book.price;
-        document.getElementById('condition').value = book.condition;
-        document.getElementById('description').value = book.description;
-        document.getElementById('image_url').value = book.image_url;
-        document.getElementById('is_sold').value = book.is_sold ? 'true' : 'false';
-        document.getElementById('seller_id').value = book.seller_id;
-        const preview = document.getElementById('previewImage');
-        if (book.image_url) {
-          preview.src = book.image_url;
-          preview.style.display = 'block';
-        } else {
-          preview.style.display = 'none';
-        }
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      })
-      .catch(err => alert(err.message));
   }
 
   async function deleteBook(id) {
@@ -293,7 +255,9 @@
     try {
       const res = await fetch(`${apiUrl}/${id}`, {
         method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
       if (res.ok) {
         alert('刪除成功');
@@ -302,35 +266,76 @@
         alert('刪除失敗');
       }
     } catch (error) {
-      alert('錯誤：' + error.message);
+      alert('刪除失敗：' + error.message);
     }
   }
 
-  function escapeHtml(text) {
-    return text.replace(/[&<>"']/g, function (m) {
-      return ({
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#39;'
-      })[m];
-    });
+  async function editBook(id) {
+    try {
+      const res = await fetch(`${apiUrl}/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!res.ok) {
+        alert('取得書籍資料失敗');
+        return;
+      }
+      const book = await res.json();
+      document.getElementById('_id').value = book._id;
+      document.getElementById('title').value = book.title || '';
+      document.getElementById('author').value = book.author || '';
+      document.getElementById('price').value = book.price || 0;
+      document.getElementById('condition').value = book.condition || '';
+      document.getElementById('description').value = book.description || '';
+      document.getElementById('image_url').value = book.image_url || '';
+      document.getElementById('is_sold').value = book.is_sold ? "true" : "false";
+      document.getElementById('seller_id').value = book.seller_id || currentUserId;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (error) {
+      alert('載入書籍資料錯誤：' + error.message);
+    }
   }
 
-  // --------- 拖拉上傳 & 辨識 -----------
+  // 防 XSS 基本函式
+  function escapeHtml(text) {
+    return text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
 
+  // 拖拉區塊功能
   const uploadArea = document.getElementById('uploadArea');
   const fileInput = document.getElementById('fileInput');
-  const statusDiv = document.getElementById('status');
-  const previewImage = document.getElementById('previewImage');
+  const status = document.getElementById('status');
 
-  // 點擊區塊時觸發檔案選擇器
   uploadArea.addEventListener('click', () => fileInput.click());
-  uploadArea.addEventListener('keydown', (e) => {
+
+  uploadArea.addEventListener('keydown', e => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       fileInput.click();
+    }
+  });
+
+  uploadArea.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    uploadArea.classList.add('dragover');
+  });
+
+  uploadArea.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    uploadArea.classList.remove('dragover');
+  });
+
+  uploadArea.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadArea.classList.remove('dragover');
+    if (e.dataTransfer.files.length > 0) {
+      handleFile(e.dataTransfer.files[0]);
     }
   });
 
@@ -340,68 +345,36 @@
     }
   });
 
-  // 拖拉相關事件
-  uploadArea.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    uploadArea.classList.add('dragover');
-  });
-  uploadArea.addEventListener('dragleave', (e) => {
-    e.preventDefault();
-    uploadArea.classList.remove('dragover');
-  });
-  uploadArea.addEventListener('drop', (e) => {
-    e.preventDefault();
-    uploadArea.classList.remove('dragover');
-    const files = e.dataTransfer.files;
-    if (files.length > 0) {
-      handleFile(files[0]);
-    }
-  });
-
   function handleFile(file) {
     if (!file.type.startsWith('image/')) {
-      statusDiv.textContent = '請上傳圖片檔案';
+      status.textContent = '請上傳圖片檔案';
       return;
     }
-    statusDiv.textContent = '圖片讀取中...';
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      previewImage.src = e.target.result;
-      previewImage.style.display = 'block';
-      statusDiv.textContent = '圖片讀取完成，開始辨識...';
-      simulateRecognition(e.target.result);
-    };
-    reader.readAsDataURL(file);
-  }
+    status.textContent = '圖片辨識中...';
 
-  // 模擬圖片辨識，將固定文字填入表單
-  function simulateRecognition(imageDataUrl) {
-    // 模擬延遲，像是 API 辨識
+    // 模擬辨識，3秒後完成
     setTimeout(() => {
-      // 這裡你可以改成真的呼叫辨識 API 的程式碼
-      // 以下是模擬辨識結果
-      const mockResult = {
-        title: '模擬辨識書名',
-        author: '模擬作者',
-        price: 100,
-        condition: '良好',
-        description: '這是模擬辨識自動填入的說明。',
-        image_url: imageDataUrl // 用上傳的圖片 base64 當圖片網址
-      };
-      // 自動填入表單
-      document.getElementById('title').value = mockResult.title;
-      document.getElementById('author').value = mockResult.author;
-      document.getElementById('price').value = mockResult.price;
-      document.getElementById('condition').value = mockResult.condition;
-      document.getElementById('description').value = mockResult.description;
-      document.getElementById('image_url').value = mockResult.image_url;
-      statusDiv.textContent = '辨識完成，自動填入表單！';
-    }, 1500);
+      // 模擬識別結果
+      const fakeTitle = 'Object Oriented';
+      const fakeAuthor = 'Blokdyk';
+      const fakePrice = 350;
+      const fakeCondition = 'New';
+      const fakeDescription = '無';
+      const imgUrl = 'https://tinypic.host/images/2025/04/07/-2025-04-07-144124.jpg';
+
+      document.getElementById('title').value = fakeTitle;
+      document.getElementById('author').value = fakeAuthor;
+      document.getElementById('price').value = fakePrice;
+      document.getElementById('condition').value = fakeCondition;
+      document.getElementById('description').value = fakeDescription;
+      document.getElementById('image_url').value = imgUrl;
+
+      status.textContent = '圖片辨識完成，請確認資料後送出。';
+    }, 3000);
   }
 
-  // 初次載入
+  // 頁面載入時自動抓取書籍
   fetchBooks();
-
 </script>
 </body>
 </html>

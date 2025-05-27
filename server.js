@@ -5,7 +5,6 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const multer = require('multer'); // ✅ 新增 multer
 const path = require('path');
 
 const User = require('./models/User');
@@ -18,35 +17,10 @@ app.use(cors()); // 允許所有來源跨域訪問 API
 app.use(express.json()); // 解析 JSON 請求
 app.use(express.static('public')); // 提供 public 資料夾的靜態檔案
 
-// ===== Multer 設定（記憶體儲存圖片）=====
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
-
 // ===== Connect to MongoDB =====
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('✅ MongoDB connected'))
   .catch(err => console.error('❌ Database connection error:', err));
-
-// ===== 圖片上傳 API (模擬 AI 辨識) =====
-app.post('/api/upload-image', upload.single('image'), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ success: false, message: '未上傳圖片' });
-  }
-
-  // 模擬 AI 辨識結果（假資料）
-  const fakeAIResult = {
-    title: "The Great Gatsby",
-    author: "F. Scott Fitzgerald",
-    condition: "Used - Good",
-    price: 180,
-    description: "A classic novel about the American dream.",
-    image_url: "https://example.com/sample-image.jpg"
-  };
-
-  setTimeout(() => {
-    res.json({ success: true, data: fakeAIResult });
-  }, 1000); // 模擬處理延遲
-});
 
 // ===== Routes =====
 // 使用者路由
@@ -62,6 +36,8 @@ const cartRoutes = require('./routes/cart');
 app.use('/api/cart', cartRoutes);
 
 // ===== Auth APIs =====
+
+// 登入
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
 
@@ -88,6 +64,7 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
+// 註冊
 app.post('/api/register', async (req, res) => {
   const { username, email, password } = req.body;
 
@@ -143,6 +120,8 @@ app.post('/api/loginByLine', async (req, res) => {
 });
 
 // ===== Cart APIs =====
+
+// 添加書籍到購物車
 app.post('/api/cart/add', async (req, res) => {
   const { userId, bookId, quantity, price } = req.body;
 
@@ -171,6 +150,7 @@ app.post('/api/cart/add', async (req, res) => {
   }
 });
 
+// 獲取購物車內容
 app.get('/api/cart/:userId', async (req, res) => {
   const { userId } = req.params;
 
