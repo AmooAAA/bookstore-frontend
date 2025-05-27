@@ -5,156 +5,122 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>二手書店</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      max-width: 900px;
-    }
-    label {
-      display: block;
-      margin-top: 10px;
-    }
-    input, textarea, select {
-      width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      box-sizing: border-box;
-    }
-    input[type="number"] {
-      -webkit-appearance: none;
-      appearance: none;
-    }
-    input[type="number"]::-webkit-outer-spin-button,
-    input[type="number"]::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-    button {
-      padding: 10px 15px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      cursor: pointer;
-      margin-right: 5px;
-      border-radius: 4px;
-      transition: background-color 0.3s ease;
-    }
-    button:hover {
-      background-color: #45a049;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      text-align: left;
-      vertical-align: middle;
-    }
-    th {
-      background-color: #f0f0f0;
-    }
-    img {
-      max-width: 100px;
-      max-height: 80px;
-      object-fit: contain;
-    }
-    /* 拖拉區塊樣式 */
-    #uploadArea {
-      margin-top: 20px;
-      padding: 20px;
-      border: 2px dashed #4CAF50;
-      text-align: center;
-      color: #666;
-      cursor: pointer;
-      border-radius: 6px;
-      user-select: none;
-      outline: none;
-    }
-    #uploadArea.dragover {
-      background-color: #e8f5e9;
-      border-color: #388e3c;
-      color: #388e3c;
-    }
-    #uploadArea:focus {
-      box-shadow: 0 0 0 3px rgba(72, 180, 97, 0.5);
-    }
-    #status {
-      margin-top: 10px;
-      font-weight: bold;
-      color: #f57c00;
-      min-height: 24px;
-    }
-    /* 手機響應式優化 */
-@media (max-width: 600px) {
   body {
-    padding: 15px 10px;
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    max-width: 900px;
+    padding: 0 10px;
   }
-
-  form {
-    padding: 15px 10px;
-  }
-
-  form label,
-  form input,
-  form select,
-  form textarea,
-  form button {
-    width: 100%;
-    font-size: 16px;
-  }
-
-  form label {
-    margin-bottom: 6px;
-  }
-
-  form input, form select, form textarea {
-    padding: 10px;
-    font-size: 16px;
-    margin-bottom: 15px;
-  }
-
-  form button {
-    padding: 12px;
-    font-size: 18px;
-  }
-
-  /* 表格寬度調整，橫向可滑動 */
-  table {
+  label {
     display: block;
+    margin-top: 10px;
+  }
+  input, textarea, select {
     width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    box-sizing: border-box;
+    font-size: 16px;
+  }
+  input[type="number"] {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  button {
+    padding: 10px 15px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-top: 10px;
+    margin-right: 5px;
+    border-radius: 4px;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+  }
+  button:hover {
+    background-color: #45a049;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 14px;
+  }
+  th, td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+    vertical-align: middle;
+  }
+  th {
+    background-color: #f0f0f0;
+  }
+  img {
+    max-width: 80px;
+    max-height: 60px;
+    object-fit: contain;
+  }
+
+  /* 拖拉區塊樣式 */
+  #uploadArea {
+    margin-top: 20px;
+    padding: 20px;
+    border: 2px dashed #4CAF50;
+    text-align: center;
+    color: #666;
+    cursor: pointer;
+    border-radius: 6px;
+    user-select: none;
+    outline: none;
+  }
+  #uploadArea.dragover {
+    background-color: #e8f5e9;
+    border-color: #388e3c;
+    color: #388e3c;
+  }
+  #uploadArea:focus {
+    box-shadow: 0 0 0 3px rgba(72, 180, 97, 0.5);
+  }
+
+  #status {
+    margin-top: 10px;
+    font-weight: bold;
+    color: #f57c00;
+    min-height: 24px;
+  }
+
+  /* 手機優化：表格可橫向捲動 */
+  .table-container {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
 
-  table thead,
-  table tbody,
-  table tr,
-  table th,
-  table td {
-    display: table;
-    width: auto;
-    white-space: nowrap;
+  @media (max-width: 600px) {
+    h1, h2 {
+      font-size: 20px;
+    }
+    button {
+      width: 100%;
+      margin-top: 10px;
+    }
+    input, textarea, select {
+      font-size: 14px;
+    }
+    th, td {
+      font-size: 12px;
+      padding: 6px;
+    }
+    img {
+      max-width: 60px;
+      max-height: 40px;
+    }
   }
-
-  table img {
-    max-width: 80px;
-    height: auto;
-  }
-
-  /* 圖片拖放區寬度適應 */
-  #uploadArea {
-    padding: 25px 10px;
-  }
-
-  /* 按鈕更寬更好按 */
-  button {
-    min-height: 44px;
-  }
-}
-
   </style>
 </head>
 <body>
@@ -195,6 +161,7 @@
 
   <h2>📖 書籍清單</h2>
   <button onclick="fetchBooks()">🔄 重新載入</button>
+  <div class="table-container">
   <table id="booksTable" aria-live="polite" aria-relevant="all">
     <thead>
       <tr>
@@ -210,6 +177,7 @@
     </thead>
     <tbody></tbody>
   </table>
+</div>
 
 <script>
   const apiUrl = 'https://cccbookbot-0c3d990eba99.herokuapp.com/api/books';
