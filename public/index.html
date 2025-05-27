@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>二手書店</title>
+  <title>我的書籍</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -92,12 +92,12 @@
 </head>
 <body>
   <button onclick="window.location.href='bookForm.html'">⬅ 返回</button>
-  <h1>二手書店</h1>
-  <h2>📚 新增 / 修改書籍</h2>
+  <h1>我的書籍</h1>
+  <h2>新增 / 修改書籍</h2>
 
   <!-- 新增拖拉上傳區塊 -->
   <div id="uploadArea" tabindex="0" role="button" aria-label="點擊或拖拉圖片上傳">
-    拖拉圖片或點擊選擇圖片上傳並辨識
+    AI辨識-點擊選擇圖片上傳
   </div>
   <input type="file" id="fileInput" accept="image/*" style="display:none" />
 
@@ -126,7 +126,7 @@
     <button type="submit">送出</button>
   </form>
 
-  <h2>📖 書籍清單</h2>
+  <h2>我的書籍清單</h2>
   <button onclick="fetchBooks()">🔄 重新載入</button>
   <table id="booksTable" aria-live="polite" aria-relevant="all">
     <thead>
