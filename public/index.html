@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
@@ -49,7 +49,7 @@
   </style>
 </head>
 <body>
-  <button onclick="window.location.href='bookForm.html'">⬅ 返回</button>
+  <button onclick="window.location.href='index.html'">⬅ 返回</button>
   <h1>二手書店</h1>
   <h2>📚 新增 / 修改書籍</h2>
 
@@ -99,10 +99,13 @@
     const token = localStorage.getItem('token');
     let currentUserId = '';
 
+    // 檢查是否登入
     if (!token) {
+      alert("請先登入");
       window.location.href = 'login.html';
     }
 
+    // 解碼 token 拿 user id
     function getUserIdFromToken(token) {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
@@ -116,6 +119,7 @@
     currentUserId = getUserIdFromToken(token);
     document.getElementById('seller_id').value = currentUserId;
 
+    // 送出表單
     document.getElementById('bookForm').addEventListener('submit', async function (e) {
       e.preventDefault();
       const bookId = document.getElementById('_id').value;
@@ -158,55 +162,65 @@
       }
     });
 
+    // 抓書籍
     async function fetchBooks() {
-      const response = await fetch(apiUrl, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      const books = await response.json();
-      const tbody = document.querySelector('#booksTable tbody');
-      tbody.innerHTML = '';
+      try {
+        const response = await fetch(apiUrl, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        const books = await response.json();
+        const tbody = document.querySelector('#booksTable tbody');
+        tbody.innerHTML = '';
 
-      const userBooks = books.filter(book => book.seller_id === currentUserId);
-      userBooks.forEach(book => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${book.title}</td>
-          <td>${book.author}</td>
-          <td>$${book.price}</td>
-          <td>${book.condition}</td>
-          <td>${book.description || ''}</td>
-          <td>${book.is_sold ? '✔️' : '❌'}</td>
-          <td><img src="${book.image_url}" alt="書籍圖片"></td>
-          <td>
-            <button onclick="editBook('${book._id}')">編輯</button>
-            <button onclick="deleteBook('${book._id}')">刪除</button>
-          </td>
-        `;
-        tbody.appendChild(row);
-      });
-    }
-
-    async function deleteBook(id) {
-      if (!confirm('確定要刪除這本書嗎？')) return;
-      const res = await fetch(`${apiUrl}/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      if (res.ok) {
-        alert('書籍刪除成功');
-        fetchBooks();
-      } else {
-        const text = await res.text();
-        alert('刪除失敗：' + text);
+        const userBooks = books.filter(book => book.seller_id === currentUserId);
+        userBooks.forEach(book => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${book.title}</td>
+            <td>${book.author}</td>
+            <td>$${book.price}</td>
+            <td>${book.condition}</td>
+            <td>${book.description || ''}</td>
+            <td>${book.is_sold ? '✔️' : '❌'}</td>
+            <td><img src="${book.image_url}" alt="書籍圖片"></td>
+            <td>
+              <button onclick="editBook('${book._id}')">編輯</button>
+              <button onclick="deleteBook('${book._id}')">刪除</button>
+            </td>
+          `;
+          tbody.appendChild(row);
+        });
+      } catch (error) {
+        alert("載入書籍失敗：" + error.message);
       }
     }
 
+    // 刪除書籍
+    async function deleteBook(id) {
+      if (!confirm('確定要刪除這本書嗎？')) return;
+      try {
+        const res = await fetch(`${apiUrl}/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (res.ok) {
+          alert('書籍刪除成功');
+          fetchBooks();
+        } else {
+          const text = await res.text();
+          alert('刪除失敗：' + text);
+        }
+      } catch (error) {
+        alert('錯誤：' + error.message);
+      }
+    }
+
+    // 編輯書籍
     async function editBook(id) {
-      console.log('editBook called with id:', id);
       try {
         const res = await fetch(`${apiUrl}/${id}`, {
           headers: {
@@ -218,7 +232,6 @@
           return;
         }
         const book = await res.json();
-        console.log('取得的書籍:', book);
         document.getElementById('_id').value = book._id || '';
         document.getElementById('title').value = book.title || '';
         document.getElementById('author').value = book.author || '';
@@ -227,13 +240,12 @@
         document.getElementById('description').value = book.description || '';
         document.getElementById('image_url').value = book.image_url || '';
         document.getElementById('is_sold').value = book.is_sold ? "true" : "false";
-        document.getElementById('seller_id').value = book.seller_id || '';
       } catch (error) {
-        console.error('editBook error:', error);
-        alert('編輯失敗，請查看 Console');
+        alert('載入書籍失敗：' + error.message);
       }
     }
 
+    // 頁面載入後執行
     fetchBooks();
   </script>
 </body>
