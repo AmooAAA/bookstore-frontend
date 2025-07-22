@@ -22,7 +22,7 @@ const AddBook = () => {
     };
 
     try {
-      const response = await fetch('http://localhost:5000/api/books', {
+      const response = await fetch('/api/books', {  // <- 這裡改成相對路徑
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -31,8 +31,11 @@ const AddBook = () => {
       });
       const data = await response.json();
       console.log('新增書籍成功:', data);
+      alert('新增書籍成功！');
+      // 你可以這裡清空表單或其他操作
     } catch (err) {
       console.error('新增書籍失敗:', err);
+      alert('新增書籍失敗，請稍後再試');
     }
   };
 
@@ -49,6 +52,7 @@ const AddBook = () => {
             required
           />
         </label>
+        <br />
         <label>
           作者:
           <input
@@ -58,6 +62,7 @@ const AddBook = () => {
             required
           />
         </label>
+        <br />
         <label>
           價格:
           <input
@@ -67,6 +72,7 @@ const AddBook = () => {
             required
           />
         </label>
+        <br />
         <label>
           狀態:
           <select
@@ -77,6 +83,7 @@ const AddBook = () => {
             <option value="used">二手</option>
           </select>
         </label>
+        <br />
         <label>
           描述:
           <textarea
@@ -84,6 +91,7 @@ const AddBook = () => {
             onChange={(e) => setDescription(e.target.value)}
           />
         </label>
+        <br />
         <label>
           圖片URL:
           <input
@@ -92,6 +100,7 @@ const AddBook = () => {
             onChange={(e) => setImageUrl(e.target.value)}
           />
         </label>
+        <br />
         <button type="submit">新增書籍</button>
       </form>
     </div>
