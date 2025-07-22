@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>註冊 Register</title>
+</head>
+<body>
+  <h2>註冊新帳號</h2>
+  <form id="registerForm">
+    <label>姓名:
+      <input type="text" id="name" required />
+    </label><br><br>
+
+    <label>Email:
+      <input type="email" id="email" required />
+    </label><br><br>
+
+    <label>密碼:
+      <input type="password" id="password" required />
+    </label><br><br>
+
+    <button type="submit">註冊</button>
+  </form>
+
+  <p id="message"></p>
+
+  <script>
+    document.getElementById('registerForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      try {
+        const response = await fetch('http://localhost:5000/api/users', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ name, email, password }),
+        });
+
+        const data = await response.json();
+        const messageEl = document.getElementById('message');
+
+        if (response.ok) {
+          messageEl.textContent = '✅ 註冊成功！';
+          messageEl.style.color = 'green';
+        } else {
+          messageEl.textContent = '❌ ' + data.error;
+          messageEl.style.color = 'red';
+        }
+      } catch (error) {
+        console.error('註冊失敗', error);
+        document.getElementById('message').textContent = '❌ 發生錯誤，請稍後再試';
+      }
+    });
+  </script>
+</body>
+</html>

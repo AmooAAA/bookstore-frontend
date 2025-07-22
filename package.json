@@ -10,14 +10,21 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+<<<<<<< HEAD
     "@line/bot-sdk": "^9.9.0",
+=======
+>>>>>>> 2d61428640698a27521fcaf1dff8927d5973df2a
     "bcryptjs": "^3.0.2",
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
+<<<<<<< HEAD
     "mongoose": "^8.13.2",
     "multer": "^2.0.0"
+=======
+    "mongoose": "^8.13.2"
+>>>>>>> 2d61428640698a27521fcaf1dff8927d5973df2a
   }
 }
