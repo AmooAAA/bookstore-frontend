@@ -1,3 +1,4 @@
+// BookList.js
 import React, { useState, useEffect } from 'react';
 import './BookList.css'; // 如果你有額外 CSS 的話可以加上
 
@@ -5,7 +6,7 @@ const BookList = () => {
   const [books, setBooks] = useState([]);
 
   useEffect(() => {
-    fetch('/api/books')  // <-- 改這裡，改成相對路徑
+    fetch('https://line-shelf-ai.onrender.com/api/books')
       .then(response => response.json())
       .then(data => {
         console.log('取得的書籍資料:', data);

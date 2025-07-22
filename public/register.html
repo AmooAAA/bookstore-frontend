@@ -33,8 +33,7 @@
       const password = document.getElementById('password').value;
 
       try {
-        // 這裡改成本地端API URL
-        const response = await fetch('http://localhost:5000/api/register', {
+        const response = await fetch('https://line-shelf-ai.onrender.com/api/books', { // 更正為正確的 API 路徑
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -50,7 +49,7 @@
           messageEl.style.color = 'green';
           messageEl.innerHTML += '<br>您可以 <a href="/login.html">登入</a> 你的帳號';
         } else {
-          messageEl.textContent = '❌ ' + (data.message || '註冊失敗');
+          messageEl.textContent = '❌ ' + data.message;  // 改為 message
           messageEl.style.color = 'red';
         }
       } catch (error) {
