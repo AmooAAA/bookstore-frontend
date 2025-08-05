@@ -4,57 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Book Store</title>
+
+  <!-- LIFF SDK 保留 -->
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 2rem;
-      background-color: #f9f9f9;
-    }
 
-    nav a {
-      margin-right: 1rem;
-      font-size: 1.1rem;
-      text-decoration: none;
-      color: #0077cc;
-    }
-
-    h1 {
-      color: #333;
-    }
-
-    form > div {
-      margin-bottom: 1rem;
-    }
-
-    input, select, button {
-      padding: 0.5rem;
-      font-size: 1rem;
-      margin-right: 0.5rem;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 2rem;
-      background-color: #fff;
-    }
-
-    th, td {
-      border: 1px solid #ccc;
-      padding: 0.75rem;
-      text-align: center;
-    }
-
-    th {
-      background-color: #eee;
-    }
-
-    img {
-      max-width: 100px;
-      height: auto;
-    }
-  </style>
+  <!-- 外部 CSS -->
+  <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
 
@@ -64,7 +19,10 @@
     <a href="index.html">📦 查看我的書籍</a>
   </nav>
 
-  <div>👤 歡迎，<span id="lineName">使用者</span>！</div>
+  <div>
+    👤 歡迎，<span id="lineName">使用者</span>！
+    <button onclick="loginWithLINE()">🔐 使用 LINE 登入</button>
+  </div>
 
   <!-- 搜尋表單 -->
   <h1>📑 書籍搜尋與篩選</h1>
@@ -126,6 +84,7 @@
     <tbody></tbody>
   </table>
 
+<<<<<<< HEAD
   <script>
     // 🔄 網址參數檢查，自動跳轉其他頁面
     window.onload = function () {
@@ -245,5 +204,9 @@
       }
     }
   </script>
+=======
+  <!-- 外部 JS -->
+  <script src="js/main.js"></script>
+>>>>>>> temp-branch
 </body>
 </html>
