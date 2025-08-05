@@ -32,7 +32,7 @@ const bookRoutes = require('./routes/bookRoutes');
 app.use('/api', bookRoutes);
 
 // 購物車路由
-const cartRoutes = require('./routes/cart');
+const cartRoutes = require('./routes/cartRoutes');
 app.use('/api/cart', cartRoutes);
 
 // ===== Auth APIs =====
