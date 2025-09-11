@@ -6,7 +6,7 @@ const BookList = () => {
   const [books, setBooks] = useState([]);
 
   useEffect(() => {
-    fetch('https://cccbookbot-0c3d990eba99.herokuapp.com/api/books')
+    fetch('https://bookbot-v1-a253e1b913a2.herokuapp.com/api/books')
       .then(response => response.json())
       .then(data => {
         console.log('取得的書籍資料:', data);
